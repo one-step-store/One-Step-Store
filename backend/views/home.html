@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h2 class="mt-5">Welcome to Home Page</h2>
+      <div id="user-info"></div>
+      <div id="address">
+        <ul id="address-list"></ul>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      // Fungsi utama untuk mengambil data user
+      async function getUserData() {
+        try {
+          // Ambil token dari localStorage
+          const token = localStorage.getItem("token");
+
+          if (!token) {
+            alert("You need to login first.");
+            window.location.href = "login.html"; // Redirect ke halaman login jika token tidak ada
+            return;
+          }
+
+          // Kirim permintaan GET dengan Axios
+          const response = await axios.get(
+            "http://localhost:3000/api/auth/user",
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`, // Menambahkan token ke header
+              },
+            }
+          );
+
+          const data = response.data;
+
+          // Periksa apakah ada pesan error
+          if (data.message) {
+            alert(data.message); // Jika ada error dari server
+          } else {
+            // Menampilkan nama user
+            document.getElementById(
+              "user-info"
+            ).innerHTML = `Hello, ${data.first_name}!`;
+
+            // Menampilkan alamat user
+            const alamat = data.addresses; // Ambil array alamat
+            const addressList = document.getElementById("address-list"); // Ambil elemen ul
+
+            // Kosongkan list sebelum menambahkan data baru
+            addressList.innerHTML = "";
+
+            // Loop untuk setiap alamat
+            for (const alamatItem of alamat) {
+              for (const key in alamatItem) {
+                const li = document.createElement("li");
+                li.textContent = `${key}: ${alamatItem[key]}`;
+                addressList.appendChild(li);
+              }
+            }
+          }
+        } catch (error) {
+          // Tangani error dari server atau koneksi
+          console.error("Error:", error);
+
+          if (error.response) {
+            // Server merespons dengan status di luar 2xx
+            alert(error.response.data.message || "Failed to fetch user data.");
+          } else if (error.request) {
+            // Permintaan terkirim tapi tidak ada respons
+            alert("No response from server. Please try again later.");
+          } else {
+            // Error lain
+            alert("An error occurred: " + error.message);
+          }
+        }
+      }
+
+      // Panggil fungsi untuk mengambil data user
+      getUserData();
+    </script>
+  </body>
+</html>
