@@ -37,11 +37,11 @@ const AdminSidebar = () => {
         </NavLink>
 
         <NavLink
-          to="/admin/orders"
+          to="/dashboard/order-list"
           className="w-full h-12 font-bold  text-black hover:text-blue-500 flex items-center gap-2 text-[14px]"
         >
           <FaUser className="ml-4"/>
-          Orders
+          Orders List
         </NavLink>
 
         <button

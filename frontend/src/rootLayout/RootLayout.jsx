@@ -13,7 +13,6 @@ function RootLayout() {
         <AdminSidebar />
       </div>
 
-      {/* Konten Utama */}
       <div className="flex flex-col flex-1">
         <AdminNavbar />
         <div className="flex-1">
