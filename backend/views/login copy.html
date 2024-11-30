@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h2 class="mt-5">Login</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" class="form-control" id="email" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" class="form-control" id="password" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+      <p class="mt-3">
+        Don't have an account? <a href="register.html">Register here</a>
+      </p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          // Ambil nilai email dan password dari input
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          try {
+            // Kirim permintaan login ke server menggunakan Axios
+            const response = await axios.post(
+              "http://localhost:3000/api/auth/login",
+              {
+                email: email,
+                password: password,
+              }
+            );
+
+            // Jika login berhasil
+            alert("Login successful");
+            localStorage.setItem("token", response.data.token); // Simpan token di localStorage
+            window.location.href = "home.html"; // Redirect ke halaman home
+          } catch (error) {
+            // Tangani error dari server atau koneksi
+            if (error.response) {
+              // Server merespons dengan status di luar 2xx
+              alert(error.response.data.message || "Login failed");
+            } else if (error.request) {
+              // Permintaan terkirim tapi tidak ada respons
+              alert("No response from server. Please try again later.");
+            } else {
+              // Error lain
+              alert("An error occurred: " + error.message);
+            }
+            console.error("Error during login:", error);
+          }
+        });
+    </script>
+  </body>
+</html>
