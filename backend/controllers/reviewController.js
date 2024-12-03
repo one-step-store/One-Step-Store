@@ -10,10 +10,11 @@ exports.addReview = async (req, res) => {
     const orderHistory = await OrderHistory.findOne({
       user: userId,
       product: product,
+      status: "delivered",
     });
 
     if (!orderHistory) {
-      return res.status(400).json({ message: "You can only review products you have purchased." });
+      return res.status(400).json({ message: "You can only review products you have purchased and status delivered." });
     }
 
     // Periksa apakah review sudah ada untuk produk ini

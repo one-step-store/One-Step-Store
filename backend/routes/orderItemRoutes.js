@@ -14,7 +14,7 @@ router.get("/", verifyToken, getOrderItems);
 router.get("/:id", verifyToken, getOrderItemById);
 
 // Route untuk mengedit order item
-router.put("/:id", verifyToken, editOrderItem);
+router.patch("/:id", verifyToken, editOrderItem);
 
 // Route untuk menghapus order item
 router.delete("/:id", verifyToken, deleteOrderItem);
