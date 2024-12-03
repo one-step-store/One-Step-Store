@@ -6,7 +6,6 @@ exports.addReview = async (req, res) => {
     const { product, rating, comment } = req.body;
     const userId = req.user._id;
 
-    // Periksa apakah user telah memesan produk
     const orderHistory = await OrderHistory.findOne({
       user: userId,
       product: product,
@@ -17,13 +16,11 @@ exports.addReview = async (req, res) => {
       return res.status(400).json({ message: "You can only review products you have purchased and status delivered." });
     }
 
-    // Periksa apakah review sudah ada untuk produk ini
     const existingReview = await Review.findOne({ product, user: userId });
     if (existingReview) {
       return res.status(400).json({ message: "You can only review a product once." });
     }
 
-    // Tambahkan review baru
     const review = new Review({ product, user: userId, rating, comment });
     await review.save();
 
@@ -37,7 +34,6 @@ exports.getReviewsByProduct = async (req, res) => {
   try {
     const { productId } = req.params;
 
-    // Ambil semua review untuk produk tertentu
     const reviews = await Review.find({ product: productId }).populate("user", "name");
 
     if (!reviews || reviews.length === 0) {
@@ -56,13 +52,11 @@ exports.editReview = async (req, res) => {
     const { rating, comment } = req.body;
     const userId = req.user._id;
 
-    // Periksa apakah review ada dan milik user
     const review = await Review.findOne({ _id: id, user: userId });
     if (!review) {
       return res.status(404).json({ message: "Review not found or not authorized." });
     }
 
-    // Update review
     review.rating = rating || review.rating;
     review.comment = comment || review.comment;
     await review.save();
@@ -78,13 +72,11 @@ exports.deleteReview = async (req, res) => {
     const { id } = req.params;
     const userId = req.user._id;
 
-    // Periksa apakah review ada dan milik user
     const review = await Review.findOne({ _id: id, user: userId });
     if (!review) {
       return res.status(404).json({ message: "Review not found or not authorized." });
     }
 
-    // Hapus review
     await review.delete();
 
     res.status(200).json({ message: "Review deleted successfully." });

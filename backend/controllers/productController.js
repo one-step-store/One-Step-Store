@@ -7,19 +7,15 @@ const sharp = require("sharp");
 
 exports.getAllProducts = async (req, res) => {
   try {
-    // Ambil semua produk
     const products = await Product.find().populate("category").populate("brand");
 
-    // Buat daftar produk ID
     const productIds = products.map(product => product._id);
 
-    // Ambil semua review yang berkaitan dengan daftar produk
     const reviews = await Review.find({ product: { $in: productIds } }).populate(
       "user",
       "first_name last_name"
     );
 
-    // Gabungkan produk dengan review masing-masing
     const productsWithReviews = products.map(product => {
       const productReviews = reviews.filter(review =>
         review.product.equals(product._id)
@@ -27,7 +23,6 @@ exports.getAllProducts = async (req, res) => {
       return { ...product.toObject(), reviews: productReviews };
     });
 
-    // Kirimkan data produk beserta review
     res.status(200).json(productsWithReviews);
 
   } catch (error) {
@@ -46,7 +41,6 @@ exports.getProductById = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Fetch reviews related to the product
     const reviews = await Review.find({ product: req.params.id }).populate("user", "first_name last_name");
 
     res.status(200).json({ product, reviews });
@@ -118,26 +112,6 @@ exports.upload = multer({
   fileFilter,
 });
 
-// exports.uploadProductImage = async (req, res) => {
-//   try {
-//     const product = await Product.findById(req.params.id);
-//     if (!product) {
-//       return res.status(404).json({ message: "Product not found" });
-//     }
-
-//     if (product.image) {
-//       fs.unlinkSync(product.image); 
-//     }
-
-//     product.image = req.file.path;
-//     await brand.save();
-
-//     res.status(200).json(brand);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
 exports.uploadProductImage = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -169,18 +143,6 @@ exports.uploadProductImage = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-// exports.getProductImage = async (req, res) => {
-//   try {
-//     const product = await Product.findById(req.params.id);
-//     if (!product || !product.image) {
-//       return res.status(404).json({ message: "Product or image not found" });
-//     }
-//     res.sendFile(path.resolve(product.image)); // Send the image file directly
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 
 exports.getProductImage = async (req, res) => {
   try {
