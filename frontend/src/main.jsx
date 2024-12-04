@@ -1,17 +1,14 @@
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import { RouterProvider } from 'react-router-dom'
-import { routes } from './config/routes'
-import { StrictMode } from "react";
-// import { AuthProvider } from './context/AuthContext';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { RouterProvider } from 'react-router-dom';
+import { routes } from './config/routes';
+import { CartProvider } from './context/CartContext'; // Pastikan konteks keranjang diimpor
+import './index.css'; // Atau gaya global Anda
 
-
-createRoot(document.getElementById('root')).render(
-  // <AuthProvider>
-  //   <RouterProvider router={routes}></RouterProvider>
-  // </AuthProvider>,
-  <StrictMode>
-  <RouterProvider router={routes} />
-  </StrictMode>
-)
-
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <CartProvider>
+      <RouterProvider router={routes} />
+    </CartProvider>
+  </React.StrictMode>
+);
