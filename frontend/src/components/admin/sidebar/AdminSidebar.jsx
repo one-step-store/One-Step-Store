@@ -4,15 +4,15 @@ import { NavLink } from 'react-router-dom';
 
 const AdminSidebar = () => {
   return (
-    <aside className="flex justify-around items-center h-16 bg-gray-100 shadow-md">
+    <aside className="fixed bottom-0 left-0 w-full z-40 bg-black text-white shadow-md flex justify-around items-center h-16">
       {/* Dashboard */}
       <NavLink
         to="/dashboard"
         end
         className={({ isActive }) =>
           `flex flex-col items-center text-sm font-bold ${
-            isActive ? 'text-blue-500' : 'text-gray-700'
-          } hover:text-blue-500`
+            isActive ? 'text-white underline' : 'text-gray-400'
+          } hover:text-white`
         }
       >
         <FaTachometerAlt />
@@ -24,8 +24,8 @@ const AdminSidebar = () => {
         to="/dashboard/all-products"
         className={({ isActive }) =>
           `flex flex-col items-center text-sm font-bold ${
-            isActive ? 'text-blue-500' : 'text-gray-700'
-          } hover:text-blue-500`
+            isActive ? 'text-white underline' : 'text-gray-400'
+          } hover:text-white`
         }
       >
         <FaBox />
@@ -37,8 +37,8 @@ const AdminSidebar = () => {
         to="/dashboard/all-categories"
         className={({ isActive }) =>
           `flex flex-col items-center text-sm font-bold ${
-            isActive ? 'text-blue-500' : 'text-gray-700'
-          } hover:text-blue-500`
+            isActive ? 'text-white underline' : 'text-gray-400'
+          } hover:text-white`
         }
       >
         <FaTags />
@@ -50,8 +50,8 @@ const AdminSidebar = () => {
         to="/dashboard/all-brands"
         className={({ isActive }) =>
           `flex flex-col items-center text-sm font-bold ${
-            isActive ? 'text-blue-500' : 'text-gray-700'
-          } hover:text-blue-500`
+            isActive ? 'text-white underline' : 'text-gray-400'
+          } hover:text-white`
         }
       >
         <FaTrademark />
@@ -63,8 +63,8 @@ const AdminSidebar = () => {
         to="/dashboard/all-users"
         className={({ isActive }) =>
           `flex flex-col items-center text-sm font-bold ${
-            isActive ? 'text-blue-500' : 'text-gray-700'
-          } hover:text-blue-500`
+            isActive ? 'text-white underline' : 'text-gray-400'
+          } hover:text-white`
         }
       >
         <FaUsers />

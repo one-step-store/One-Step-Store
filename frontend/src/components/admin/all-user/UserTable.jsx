@@ -1,11 +1,26 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaEye } from 'react-icons/fa';
+import { FaTrashAlt, FaPlus } from 'react-icons/fa';
 
 const UserTable = () => {
+  // test
   const users = [
-    { id: 1, username: 'John Doe', detailLink: '/dashboard/user-detail/1' },
-    { id: 2, username: 'Jane Smith', detailLink: '/dashboard/user-detail/2' },
+    {
+      id: 1,
+      username: 'JohnDoe123',
+      name: 'John Doe',
+      email: 'johndoe@example.com',
+      phone: '+1234567890',
+      role: 'Admin',
+    },
+    {
+      id: 2,
+      username: 'JaneDoe456',
+      name: 'Jane Doe',
+      email: 'janedoe@example.com',
+      phone: '+0987654321',
+      role: 'User',
+    },
   ];
 
   return (
@@ -13,7 +28,16 @@ const UserTable = () => {
       {/* Header */}
       <div className="border-b-2 flex justify-between items-center pb-4 mb-4">
         <h1 className="font-semibold text-lg">All Users</h1>
-        <span className="text-gray-500 text-xl">&#x1F465;</span>
+        <div className="flex items-center space-x-4">
+          <Link
+            to="/dashboard/add-user"
+            className="flex items-center bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800"
+          >
+            <FaPlus className="mr-2" />
+            Add User
+          </Link>
+          <span className="text-gray-500 text-xl">&#x1F465;</span>
+        </div>
       </div>
 
       {/* Table */}
@@ -22,7 +46,11 @@ const UserTable = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-4 py-3">Username</th>
-              <th className="px-4 py-3 text-center">Detail</th>
+              <th className="px-4 py-3">Name</th>
+              <th className="px-4 py-3">Email</th>
+              <th className="px-4 py-3">Phone Number</th>
+              <th className="px-4 py-3">Role</th>
+              <th className="px-4 py-3 text-center">Hapus Akun</th>
             </tr>
           </thead>
           <tbody>
@@ -32,16 +60,17 @@ const UserTable = () => {
                 className={`border-t ${index % 2 === 0 ? 'bg-gray-50' : ''} hover:bg-gray-100`}
               >
                 <td className="px-4 py-3">{user.username}</td>
-                <td className="px-4 py-3 text-center relative">
-                  <Link
-                    to={'/dashboard/user-detail'}
-                    className="flex items-center justify-center group relative"
+                <td className="px-4 py-3">{user.name}</td>
+                <td className="px-4 py-3">{user.email}</td>
+                <td className="px-4 py-3">{user.phone}</td>
+                <td className="px-4 py-3">{user.role}</td>
+                <td className="px-4 py-3 text-center">
+                  <button
+                    className="flex items-center justify-center mx-auto w-10 h-10 bg-red-100 rounded-full hover:bg-red-200"
+                    onClick={() => alert(`Hapus akun ${user.name}?`)}
                   >
-                    <FaEye className="text-blue-500 text-lg group-hover:opacity-0 transition-opacity duration-200" />
-                    <span className="absolute inset-0 flex items-center justify-center text-blue-500 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      View Details
-                    </span>
-                  </Link>
+                    <FaTrashAlt className="text-red-500 text-lg" />
+                  </button>
                 </td>
               </tr>
             ))}

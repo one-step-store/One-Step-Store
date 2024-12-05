@@ -20,7 +20,7 @@ function RootLayout() {
         <AdminSidebar />
       </div>
       {/* Footer */}
-      <div
+      {/* <div
         className={`fixed bottom-20 right-4 z-50 ${
           isFooterOpen ? "h-auto" : "h-12 w-12"
         }`}
@@ -44,7 +44,7 @@ function RootLayout() {
             </ul>
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }

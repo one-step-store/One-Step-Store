@@ -4,9 +4,9 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 const BrandCard = ({ brand }) => {
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center gap-4">
+    <div className="bg-white shadow-md rounded-lg p-4 flex flex-col items-center gap-4 transform transition-transform hover:scale-105 hover:shadow-lg">
       {/* Brand Image */}
-      <div className="h-40 w-full flex items-center justify-center bg-gray-100 rounded-md">
+      <div className="h-40 w-full flex items-center justify-center bg-gray-100 rounded-md overflow-hidden">
         <img
           src={brand.image}
           alt={brand.name}
@@ -15,9 +15,10 @@ const BrandCard = ({ brand }) => {
       </div>
 
       {/* Brand Name */}
-      <h3 className="text-lg font-bold text-center">{brand.name}</h3>
+      <h3 className="text-lg font-bold text-center text-gray-800 hover:text-blue-500 transition-colors">
+        {brand.name}
+      </h3>
 
-      {/* Actions */}
       <div className="flex justify-between w-full mt-4">
         {/* Edit Button */}
         <Link

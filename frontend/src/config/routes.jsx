@@ -8,15 +8,15 @@ import RootLayout from '../rootlayout/RootLayout';
 import AdminAllProductsPage from '../pages/admin/AdminAllProductsPage';
 import AdminOrderDetailsPage from '../pages/admin/AdminOrderDetailsPage';
 import AdminAddNewProductPage from '../pages/admin/AdminNewProductPage';
-import AdminProductDetailPage from '../pages/admin/Admin ProductDetailPage';
+import AdminProductDetailPage from '../pages/admin/AdminProductDetailPage';
 import AdminCategoriesPage from '../pages/admin/AdminCategoriesPage';
 import AdminAddCategoryPage from '../pages/admin/AdminAddCategoryPage';
 import AdminBrandPage from '../pages/admin/AdminBrandPage';
 import AdminAddBrandPage from '../pages/admin/AdminAddBrandPage';
 import AdminAllUserPage from '../pages/admin/AdminAllUserPage';
-import AdminUserDetailPage from '../pages/admin/AdminUserDetailPage';
 import AdminEditBrandPage from '../pages/admin/AdminEditBrandPage';
 import AdminEditCategoryPage from '../pages/admin/AdminEditCategoryPage';
+import AdminAddUserPage from '../pages/admin/AdminAddUser';
 export const routes = createBrowserRouter([
       {
         path: '/',
@@ -76,8 +76,8 @@ export const routes = createBrowserRouter([
             element: <AdminAllUserPage />
           },
           {
-            path: 'user-detail',
-            element: <AdminUserDetailPage />
+            path: 'add-user',
+            element: <AdminAddUserPage />
           }, 
           {
             path: 'edit-brand',
