@@ -123,23 +123,38 @@ exports.uploadProductImage = async (req, res) => {
       return res.status(400).json({ message: "Image file is required" });
     }
 
-    const image = await sharp(req.file.path);
-    const metadata = await image.metadata();
+    const resizedImagePath = path.join(uploadDir, `resized-${Date.now()}.jpg`);
 
-    if (metadata.width !== metadata.height) {
-      fs.unlinkSync(req.file.path); 
-      return res.status(400).json({ message: "Image must have a 1:1 aspect ratio" });
+    // Resize gambar menjadi 150x150 dan simpan ke path baru
+    try {
+      await sharp(req.file.path)
+        .resize(500, 500)
+        .jpeg({ quality: 80 })
+        .toFile(resizedImagePath);
+
+      // Hapus gambar asli setelah di-resize
+      await fs.promises.unlink(req.file.path);
+    } catch (err) {
+      console.error("Error resizing image:", err.message);
+      return res.status(500).json({ message: "Error resizing image" });
     }
 
+    // Hapus gambar lama jika ada
     if (product.image) {
-      fs.unlinkSync(product.image);
+      try {
+        await fs.promises.unlink(product.image);
+      } catch (err) {
+        console.error("Error deleting old image:", err.message);
+      }
     }
 
-    product.image = req.file.path;
+    // Simpan path gambar baru ke database
+    product.image = resizedImagePath;
     await product.save();
 
     res.status(200).json(product);
   } catch (error) {
+    console.error("Error uploading product image:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
@@ -151,23 +166,15 @@ exports.getProductImage = async (req, res) => {
       return res.status(404).json({ message: "Product or image not found" });
     }
 
-    const originalImagePath = path.resolve(product.image);
-
-    const resizedImagePath = path.join(uploadDir, `resized-${req.params.id}.jpg`);
-
-    await sharp(originalImagePath)
-      .resize(150, 150) 
-      .toFormat("jpeg")
-      .toFile(resizedImagePath);
-
-    res.sendFile(resizedImagePath, (err) => {
+    const imagePath = path.resolve(product.image);
+    res.sendFile(imagePath, (err) => {
       if (err) {
-        console.error("Error sending resized image:", err.message);
-      } else {
-        fs.unlinkSync(resizedImagePath);
+        console.error("Error sending image:", err.message);
+        res.status(500).json({ message: "Error sending image" });
       }
     });
   } catch (error) {
+    console.error("Error getting product image:", error.message);
     res.status(500).json({ message: error.message });
   }
 };

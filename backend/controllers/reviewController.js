@@ -1,27 +1,71 @@
+const mongoose = require("mongoose");
+const Order = require("../models/Order");
 const Review = require("../models/Review");
-const OrderHistory = require("../models/OrderItemHistory");
 
 exports.addReview = async (req, res) => {
   try {
     const { product, rating, comment } = req.body;
     const userId = req.user._id;
 
-    const orderHistory = await OrderHistory.findOne({
-      user: userId,
-      product: product,
-      status: "delivered",
+    // Konversi product ke ObjectId
+    const productId = new mongoose.Types.ObjectId(product);
+
+    // Cari semua order dengan produk tersebut
+    const orders = await Order.find({
+      userId: userId,
+      "orderItems.product": productId,
     });
 
-    if (!orderHistory) {
-      return res.status(400).json({ message: "You can only review products you have purchased and status delivered." });
+    if (!orders || orders.length === 0) {
+      return res.status(400).json({ message: "You can only review products you have purchased." });
     }
 
-    const existingReview = await Review.findOne({ product, user: userId });
-    if (existingReview) {
-      return res.status(400).json({ message: "You can only review a product once." });
+    // Ambil semua orderItems yang sesuai dari semua order, dengan status "delivered"
+    const deliveredItems = orders.flatMap(order =>
+      order.orderItems.filter(
+        item =>
+          item.product.toString() === productId.toString() && item.status === "delivered"
+      )
+    );
+
+    // Jika tidak ada item yang "delivered", kembalikan error
+    if (deliveredItems.length === 0) {
+      return res.status(400).json({ message: "You can only review products that have been delivered." });
     }
 
-    const review = new Review({ product, user: userId, rating, comment });
+    // Ambil semua _id dari orderItems dengan status "delivered"
+    const deliveredOrderItemIds = deliveredItems.map(item => item._id.toString());
+
+    // Cari review yang sudah ada untuk produk ini
+    const existingReviews = await Review.find({
+      product: productId,
+      user: userId,
+      orderItemId: { $in: deliveredOrderItemIds },
+    });
+
+    // Ambil ID dari orderItems yang sudah direview
+    const reviewedOrderItemIds = existingReviews.map(review => review.orderItemId.toString());
+
+    // Cari ID dari orderItem yang belum direview
+    const unreviewedOrderItemId = deliveredOrderItemIds.find(
+      id => !reviewedOrderItemIds.includes(id)
+    );
+
+    // Jika tidak ada orderItem yang belum direview, kembalikan error
+    if (!unreviewedOrderItemId) {
+      return res.status(400).json({
+        message: "You have already reviewed all eligible purchases for this product.",
+      });
+    }
+
+    // Buat review baru untuk orderItem yang belum direview
+    const review = new Review({
+      product: productId,
+      user: userId,
+      orderItemId: unreviewedOrderItemId, // Simpan ID orderItem
+      rating,
+      comment,
+    });
     await review.save();
 
     res.status(201).json({ message: "Review added successfully.", review });

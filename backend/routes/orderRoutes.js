@@ -1,14 +1,13 @@
 const express = require('express');
 const {
   createOrder,
-  getOrdersByUser ,
-  getOrderHistoryByUser ,
-  updateOrderStatusById,
-  getAllOrders, // Import fungsi baru
-  getAllOrdersGroupedByCategory, // Import fungsi baru
-  deleteOrderById, // Import fungsi baru
+  getOrdersByUser,
+  updateOrderItemStatusById,
+  getAllOrders,
+  deleteOrderById,
+  updateOrderStatusToDone, // Import fungsi baru
 } = require('../controllers/orderController');
-const { verifyToken, adminOnly } = require('../middlewares/authMiddleware'); // Import middleware
+const { verifyToken, adminOnly } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
@@ -16,21 +15,18 @@ const router = express.Router();
 router.post('/', verifyToken, createOrder);
 
 // Rute untuk mendapatkan order berdasarkan user - hanya perlu token
-router.get('/', verifyToken, getOrdersByUser  );
+router.get('/', verifyToken, getOrdersByUser);
 
-// Rute untuk mendapatkan riwayat order berdasarkan user - hanya perlu token
-router.get('/history', verifyToken, getOrderHistoryByUser  );
-
-// Rute untuk mendapatkan semua order - hanya perlu token
+// Rute untuk mendapatkan semua order - memerlukan token dan admin
 router.get('/all', verifyToken, adminOnly, getAllOrders);
 
-// Rute untuk mendapatkan semua order dikelompokkan berdasarkan kategori - hanya perlu token
-router.get('/grouped', verifyToken, adminOnly, getAllOrdersGroupedByCategory);
-
-// Rute untuk menghapus order berdasarkan ID - memerlukan token dan harus admin
+// Rute untuk menghapus order berdasarkan ID - memerlukan token dan admin
 router.delete('/:id', verifyToken, adminOnly, deleteOrderById);
 
-// Rute untuk memperbarui status order berdasarkan ID - memerlukan token dan harus admin
-router.put('/:id/status', verifyToken, adminOnly, updateOrderStatusById);
+// Rute untuk memperbarui status order item berdasarkan ID order dan ID order item
+router.put('/:orderId/items/:orderItemId/status', verifyToken, adminOnly, updateOrderItemStatusById);
+
+// Rute untuk memperbarui status order menjadi "done"
+router.put('/:orderId/items/:orderItemId/done', verifyToken, updateOrderStatusToDone);
 
 module.exports = router;

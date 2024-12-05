@@ -1,6 +1,5 @@
 const Order = require("../models/Order");
 const OrderItem = require("../models/OrderItem");
-const OrderHistory = require("../models/OrderItemHistory");
 const Review = require("../models/Review");
 
 exports.createOrder = async (req, res) => {
@@ -12,43 +11,39 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ message: "orderItems must be a non-empty array" });
     }
 
-    // Validasi order items
+    // Ambil data orderItems dari database untuk validasi dan melengkapi data
     const items = await OrderItem.find({ _id: { $in: orderItems } }).populate("product");
 
     if (items.length !== orderItems.length) {
       return res.status(404).json({ message: "One or more order items not found" });
     }
 
-    // Hitung total harga
-    const totalPrice = items.reduce((total, item) => total + item.total_price, 0);
+    // Tambahkan status 'pending' untuk tiap order item dan format datanya
+    const formattedItems = items.map((item) => ({
+      product: item.product,
+      quantity: item.quantity,
+      total_price: item.total_price,
+      status: "pending", // Tambahkan status default
+    }));
 
-    // Buat order baru
+    // Hitung total harga
+    const totalPrice = formattedItems.reduce((total, item) => total + item.total_price, 0);
+
+    // Buat dokumen Order baru
     const order = new Order({
       userId,
-      orderItems,
+      orderItems: formattedItems,
       totalPrice,
+      paymentStatus: "pending", // Status order default
     });
     const savedOrder = await order.save();
 
-    // Pindahkan OrderItems ke OrderHistory
-    const historyData = items.map((item) => ({
-      orderId: savedOrder._id,
-      product: item.product._id,
-      quantity: item.quantity,
-      total_price: item.total_price,
-      user: userId,
-    }));
-    await OrderHistory.insertMany(historyData);
-
-    // Hapus OrderItems dari koleksi asli
+    // Hapus data OrderItems dari koleksi asli setelah dipindahkan
     await OrderItem.deleteMany({ _id: { $in: orderItems } });
 
     res.status(201).json({
-      message: "Order created and items moved to history",
-      data: {
-        order: savedOrder,
-        totalPrice,
-      },
+      message: "Order created successfully",
+      data: savedOrder,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -56,7 +51,7 @@ exports.createOrder = async (req, res) => {
 };
 
 // Mendapatkan order berdasarkan user
-exports.getOrdersByUser = async (req, res) => {
+exports.getOrdersByUser  = async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.user._id }).populate("orderItems");
 
@@ -70,39 +65,9 @@ exports.getOrdersByUser = async (req, res) => {
   }
 };
 
-// Mendapatkan riwayat order berdasarkan user dan menyertakan review produk
-// Mendapatkan riwayat order berdasarkan user dan menyertakan review produk
-exports.getOrderHistoryByUser = async (req, res) => {
-  try {
-    const history = await OrderHistory.find({ user: req.user._id })
-      .populate("product") // Populate produk pada order history
-      .populate({
-        path: 'product',
-        populate: [
-          { path: 'category', select: 'name' }, // Populate kategori dan ambil hanya nama
-          { path: 'brand', select: 'name' }, // Populate brand dan ambil hanya nama
-          {
-            path: 'reviews', // Populate reviews pada produk
-            match: { user: req.user._id }, // Hanya ambil review milik user yang bersangkutan
-            select: 'rating content user', // Hanya ambil rating, content, dan user dari review
-            options: { limit: 1 } // Membatasi hanya 1 review per produk per user
-          }
-        ]
-      })
-      .sort({ createdAt: -1 });
-
-    if (!history || history.length === 0) {
-      return res.status(404).json({ message: "No order history found for this user" });
-    }
-
-    res.status(200).json(history);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.updateOrderStatusById = async (req, res) => {
-  const { id } = req.params; // Ambil ID order dari parameter
+// Fungsi untuk memperbarui status order item berdasarkan ID order dan ID order item
+exports.updateOrderItemStatusById = async (req, res) => {
+  const { orderId, orderItemId } = req.params; // Ambil ID order dan order item dari parameter
   const { status } = req.body; // Ambil status baru dari body permintaan
 
   // Validasi status
@@ -113,46 +78,89 @@ exports.updateOrderStatusById = async (req, res) => {
 
   try {
     // Temukan order berdasarkan ID
-    const order = await Order.findById(id);
+    const order = await Order.findById(orderId);
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Update status order
-    order.status = status;
-    await order.save();
+    // Validasi paymentStatus
+    if (order.paymentStatus !== "completed") {
+      return res.status(400).json({
+        message: `Cannot update order items. Payment status must be "completed", current status: ${order.paymentStatus}`,
+      });
+    }
 
-    // Update status di OrderHistory
-    await OrderHistory.updateMany({ orderId: order._id }, { status });
+    // Temukan item dalam order berdasarkan orderItemId
+    const orderItem = order.orderItems.id(orderItemId);
+    if (!orderItem) {
+      return res.status(404).json({ message: "Order item not found" });
+    }
+
+    // Update status order item
+    orderItem.status = status;
+    await order.save(); // Simpan perubahan pada order
 
     res.status(200).json({
-      message: "Order status updated successfully",
-      order,
+      message: "Order item status updated successfully",
+      orderItem,
     });
   } catch (error) {
-    console.error(error); // Tambahkan log untuk membantu debugging
+    console.error(error); // Log error untuk debugging
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.updateOrderStatusToDone = async (req, res) => {
+  const { orderId, orderItemId } = req.params; // Ambil ID order dan order item dari parameter
+  const { status } = req.body; // Ambil status baru dari body permintaan
+
+  if (status !== "done") {
+    return res.status(400).json({ message: "Only 'done' status is allowed for this endpoint" });
+  }
+
+  try {
+    // Temukan order berdasarkan ID
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Pastikan order ini milik user yang sedang login
+    if (order.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Unauthorized to update this order" });
+    }
+
+    // Temukan item dalam order berdasarkan orderItemId
+    const orderItem = order.orderItems.id(orderItemId);
+    if (!orderItem) {
+      return res.status(404).json({ message: "Order item not found" });
+    }
+
+    // Validasi status untuk perubahan menjadi "done"
+    if (orderItem.status !== "delivered") {
+      return res.status(400).json({
+        message: "Order item can only be marked as 'done' if its status is 'delivered'",
+      });
+    }
+
+    // Update status order item ke "done"
+    orderItem.status = status;
+    await order.save(); // Simpan perubahan pada order
+
+    res.status(200).json({
+      message: `Order item status updated to 'done' successfully`,
+      orderItem,
+    });
+  } catch (error) {
+    console.error(error); // Log error untuk debugging
     res.status(500).json({ message: "Server error" });
   }
 };
 
 exports.getAllOrders = async (req, res) => {
   try {
-    const orders = await OrderHistory.find().populate("product") // Populate produk pada order history
-    .populate({
-      path: 'product',
-      populate: [
-        { path: 'category', select: 'name' }, // Populate kategori dan ambil hanya nama
-        { path: 'brand', select: 'name' }, // Populate brand dan ambil hanya nama
-        {
-          path: 'reviews', // Populate reviews pada produk
-          match: { user: req.user._id }, // Hanya ambil review milik user yang bersangkutan
-          select: 'rating content user', // Hanya ambil rating, content, dan user dari review
-          options: { limit: 1 } // Membatasi hanya 1 review per produk per user
-        }
-      ]
-    })
-    .sort({ createdAt: -1 });
-     // Ambil semua order dari OrderHistory
+    const orders = await Order.find().populate("orderItems").sort({ createdAt: -1 });
+
     res.status(200).json(orders); // Kirim semua order
   } catch (error) {
     console.error(error);
@@ -160,51 +168,6 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
-// Fungsi untuk mendapatkan semua order dari OrderHistory dan mengelompokkannya berdasarkan kategori
-exports.getAllOrdersGroupedByCategory = async (req, res) => {
-  try {
-    // Ambil riwayat order berdasarkan user dengan populate untuk produk, kategori, dan brand
-    const orders = await OrderHistory.find()
-      .populate({
-        path: 'product',
-        populate: [
-          { path: 'category', select: 'name' }, // Populate kategori dan ambil hanya nama
-          { path: 'brand', select: 'name' }, // Populate brand dan ambil hanya nama
-          {
-            path: 'reviews', // Populate reviews pada produk
-            match: { user: req.user._id }, // Hanya ambil review milik user yang bersangkutan
-            select: 'rating content user', // Hanya ambil rating, content, dan user dari review
-            options: { limit: 1 } // Membatasi hanya 1 review per produk per user
-          }
-        ]
-      })
-      .sort({ createdAt: -1 });
-
-    // Mengelompokkan order berdasarkan kategori
-    const groupedOrders = orders.reduce((acc, order) => {
-      const category = order.product.category ? order.product.category.name : 'Uncategorized'; // Ambil nama kategori
-      if (!acc[category]) {
-        acc[category] = []; // Inisialisasi array jika kategori belum ada
-      }
-      acc[category].push(order); // Tambahkan order ke kategori yang sesuai
-      return acc;
-    }, {});
-
-    // Mengubah struktur hasil agar lebih terorganisir
-    const result = Object.keys(groupedOrders).map(category => ({
-      category,
-      orders: groupedOrders[category]
-    }));
-
-    res.status(200).json(result); // Kirim hasil yang dikelompokkan
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-
-// Fungsi untuk menghapus order berdasarkan ID
 // Fungsi untuk menghapus order berdasarkan ID
 exports.deleteOrderById = async (req, res) => {
   const { id } = req.params; // Ambil ID order dari parameter
@@ -216,10 +179,7 @@ exports.deleteOrderById = async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Hapus entri yang terkait di OrderHistory
-    await OrderHistory.deleteMany({ orderId: id });
-
-    res.status(200).json({ message: 'Order and related history deleted successfully' });
+    res.status(200).json({ message: 'Order deleted successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

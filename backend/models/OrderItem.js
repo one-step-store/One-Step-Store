@@ -17,7 +17,7 @@ const orderItemSchema = new mongoose.Schema({
   user: {  // Pastikan field ini ada
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true  // Harus ada, sesuai dengan pesan error
+    required: true
   }
 });
 

@@ -4,47 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Keranjang</title>
-    <!-- Link Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <h2 class="my-4">Keranjang Belanja</h2>
-        <div id="cart-items" class="row"></div> <!-- Daftar keranjang akan ditampilkan di sini -->
-        
-        <button id="submit-order-btn" class="btn btn-success mt-4">Proses Order</button>
+        <div id="cart-items" class="row"></div>
+        <button id="submit-order-btn" class="btn btn-success mt-4">Lanjut ke Checkout</button>
     </div>
 
-    <!-- Link JS dan Popper.js untuk Bootstrap -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
     <script>
         const token = localStorage.getItem('token');
         if (!token) {
             alert('Anda harus login terlebih dahulu.');
-            window.location.href = 'login.html'; // Arahkan ke halaman login jika belum login
+            window.location.href = 'login.html';
         }
 
-        // Fungsi format Rupiah
         function formatRupiah(amount) {
             return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
         }
 
-        // Fetch daftar order item
         async function fetchOrderItems() {
             try {
                 const response = await fetch('http://localhost:3000/api/order-items', {
                     method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                if (!response.ok) {
-                    throw new Error('Gagal memuat data keranjang');
-                }
+                if (!response.ok) throw new Error('Gagal memuat data keranjang');
 
                 const orderItems = await response.json();
                 const cartItemsDiv = document.getElementById('cart-items');
@@ -64,7 +54,7 @@
                                 <h5 class="card-title">${item.product.name}</h5>
                                 <p class="card-text">Quantity: ${item.quantity}</p>
                                 <p class="card-text">Total Harga: ${formatRupiah(item.product.price * item.quantity)}</p>
-                                <input type="checkbox" class="order-item-checkbox" data-id="${item._id}"> Pilih untuk checkout
+                                <input type="checkbox" class="order-item-checkbox" data-id="${item._id}" data-name="${item.product.name}" data-quantity="${item.quantity}" data-price="${item.product.price}">
                             </div>
                         </div>
                     `;
@@ -75,24 +65,25 @@
             }
         }
 
-        // Proses order dengan mengirimkan ID yang tercentang
         document.getElementById('submit-order-btn').addEventListener('click', () => {
             const selectedItems = [];
             const checkboxes = document.querySelectorAll('.order-item-checkbox:checked');
             checkboxes.forEach(checkbox => {
-                selectedItems.push(checkbox.dataset.id); // Ambil ID order_item yang dipilih
+                selectedItems.push({
+                    id: checkbox.dataset.id,
+                    name: checkbox.dataset.name,
+                    quantity: checkbox.dataset.quantity,
+                    price: checkbox.dataset.price
+                });
             });
 
             if (selectedItems.length === 0) {
-                alert('Pilih minimal satu item untuk proses order.');
+                alert('Pilih minimal satu item untuk melanjutkan.');
                 return;
             }
 
-            // Simpan selectedItems ke localStorage atau sessionStorage
             localStorage.setItem('selectedOrderItems', JSON.stringify(selectedItems));
-
-            // Arahkan ke halaman detail order
-            window.location.href = 'order-detail.html';
+            window.location.href = 'checkout.html';
         });
 
         fetchOrderItems();
