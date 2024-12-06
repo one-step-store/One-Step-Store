@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Produk</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h2 class="my-4">Daftar Produk</h2>
+        <div id="products" class="row"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Anda harus login terlebih dahulu.');
+            window.location.href = 'login.html';
+        }
+
+        // Fungsi untuk menampilkan rating dalam bentuk bintang
+        function renderRating(rating, reviewCount) {
+            let starsHtml = '';
+
+            // Tambahkan bintang kuning sesuai rating
+            for (let i = 0; i < Math.floor(rating); i++) {
+                starsHtml += '<span style="color: gold; font-size: 20px;">&#9733;</span>';
+            }
+
+            // Tambahkan bintang kosong untuk melengkapi 5 bintang
+            for (let i = Math.floor(rating); i < 5; i++) {
+                starsHtml += '<span style="color: lightgray; font-size: 20px;">&#9734;</span>';
+            }
+
+            // Tambahkan jumlah review
+            return `${starsHtml} <span style="font-size: 16px;">(${reviewCount})</span>`;
+        }
+
+        async function fetchProducts() {
+            const response = await fetch('http://localhost:3000/api/products', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const products = await response.json();
+            const productsDiv = document.getElementById('products');
+            productsDiv.innerHTML = '';
+
+            products.forEach(product => {
+                const totalRating = product.reviews.reduce((sum, review) => sum + review.rating, 0);
+                const averageRating = product.reviews.length > 0 ? (totalRating / product.reviews.length).toFixed(1) : 0;
+                const reviewCount = product.reviews.length;
+
+                const productElement = document.createElement('div');
+                productElement.classList.add('col-md-4', 'my-2');
+                productElement.innerHTML = `
+                    <div class="card">
+                        <img src="http://localhost:3000/api/products/${product._id}/imageproduct" class="card-img-top" alt="${product.name}">
+                        <div class="card-body">
+                            <h5 class="card-title">${product.name}</h5>
+                            <p class="card-text">Harga: Rp. ${product.price}</p>
+                            <p class="card-text">Rating: ${renderRating(averageRating, reviewCount)}</p>
+                            <button class="btn btn-primary view-detail" data-id="${product._id}">Detail Produk</button>
+                        </div>
+                    </div>
+                `;
+                productsDiv.appendChild(productElement);
+            });
+
+            // Tambahkan event listener untuk tombol detail
+            document.querySelectorAll('.view-detail').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = e.target.dataset.id;
+                    window.location.href = `detail.html?id=${productId}`;
+                });
+            });
+        }
+
+        fetchProducts();
+    </script>
+</body>
+</html>

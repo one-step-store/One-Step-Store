@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>User Information</h1>
+        <div id="userInfo"></div>
+        <button id="logout">Logout</button>
+    </div>
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('Unauthorized. Please login.');
+            window.location.href = 'login.html';
+        }
+
+        // Fetch user data
+        fetch('/api/auth/user', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    window.location.href = 'login.html';
+                } else {
+                    const userInfo = document.getElementById('userInfo');
+                    userInfo.innerHTML = `
+                        <p>Name: ${data.name}</p>
+                        <p>Email: ${data.email}</p>
+                    `;
+                }
+            });
+
+        // Logout functionality
+        document.getElementById('logout').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

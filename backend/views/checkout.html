@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h2 class="my-4">Checkout</h2>
+        <div id="selected-items" class="row"></div>
+        <h4 class="my-4">Total Harga: <span id="total-price">0</span></h4>
+        <button id="confirm-order-btn" class="btn btn-success">Proses Order</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const token = localStorage.getItem('token');
+        const selectedItems = JSON.parse(localStorage.getItem('selectedOrderItems')) || [];
+        const selectedItemsDiv = document.getElementById('selected-items');
+        const totalPriceSpan = document.getElementById('total-price');
+
+        if (selectedItems.length === 0) {
+            alert('Tidak ada barang yang dipilih.');
+            window.location.href = 'keranjang.html';
+        }
+
+        let totalPrice = 0;
+        selectedItems.forEach(item => {
+            totalPrice += item.price * item.quantity;
+
+            const itemElement = document.createElement('div');
+            itemElement.classList.add('col-md-4', 'my-2');
+            itemElement.innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">${item.name}</h5>
+                        <p class="card-text">Quantity: ${item.quantity}</p>
+                        <p class="card-text">Total Harga: ${formatRupiah(item.price * item.quantity)}</p>
+                    </div>
+                </div>
+            `;
+            selectedItemsDiv.appendChild(itemElement);
+        });
+
+        totalPriceSpan.textContent = formatRupiah(totalPrice);
+
+        document.getElementById('confirm-order-btn').addEventListener('click', async () => {
+            const orderItemIds = selectedItems.map(item => item.id);
+
+            try {
+                const response = await fetch('http://localhost:3000/api/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ orderItems: orderItemIds })
+                });
+
+                if (!response.ok) throw new Error('Gagal memproses order');
+
+                alert('Order berhasil diproses!');
+                localStorage.removeItem('selectedOrderItems');
+                window.location.href = 'keranjang.html';
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        function formatRupiah(amount) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
+        }
+    </script>
+</body>
+</html>

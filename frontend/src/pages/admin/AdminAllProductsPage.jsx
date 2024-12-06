@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 import ProductCard from "../../components/admin/all-products/ProductCard";
 import Pagination from "../../components/admin/all-products/Pagination";
-
 const AdminAllProductsPage = () => {
   // Static product data
   const products = Array.from({ length: 12 }, (_, index) => ({
