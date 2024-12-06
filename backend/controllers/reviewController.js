@@ -116,12 +116,11 @@ exports.deleteReview = async (req, res) => {
     const { id } = req.params;
     const userId = req.user._id;
 
-    const review = await Review.findOne({ _id: id, user: userId });
-    if (!review) {
+    // Hapus dokumen langsung berdasarkan filter
+    const result = await Review.deleteOne({ _id: id, user: userId });
+    if (result.deletedCount === 0) {
       return res.status(404).json({ message: "Review not found or not authorized." });
     }
-
-    await review.delete();
 
     res.status(200).json({ message: "Review deleted successfully." });
   } catch (error) {

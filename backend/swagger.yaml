@@ -1,0 +1,1666 @@
+openapi: 3.0.3
+info:
+  title: One Step Store API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+tags:
+  - name: Auth
+    description: Endpoints related to user authentication
+  - name: Address
+    description: Endpoints related to user addresses
+  - name: Product
+    description: Endpoints related to products
+  - name: Brand
+    description: Endpoints related to brands
+  - name: Category
+    description: Endpoints related to categories
+  - name: Orders
+    description: Endpoints related to orders
+  - name: Order Items
+    description: Endpoints related to order items
+  - name: Reviews
+    description: Endpoints related to product reviews
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: john_doe
+                first_name:
+                  type: string
+                  example: John
+                last_name:
+                  type: string
+                  example: Doe
+                email:
+                  type: string
+                  example: john@example.com
+                password:
+                  type: string
+                  example: password123
+                phone:
+                  type: string
+                  example: "+123456789"
+                role:
+                  type: string
+                  example: customer
+      responses:
+        201:
+          description: User registered successfully
+        400:
+          description: Validation errors
+        500:
+          description: Server error
+
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: john@gmail.com
+                password:
+                  type: string
+                  example: john123
+      responses:
+        200:
+          description: Login successful
+        400:
+          description: Invalid credentials
+        500:
+          description: Server error
+
+  /addresses:
+    get:
+      tags:
+        - Address
+      summary: Get all addresses for the logged-in user
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: List of addresses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    user:
+                      type: string
+                      description: User ID
+                    street:
+                      type: string
+                      example: "123 Main St"
+                    city:
+                      type: string
+                      example: "New York"
+                    state:
+                      type: string
+                      example: "NY"
+                    postalCode:
+                      type: string
+                      example: "10001"
+                    country:
+                      type: string
+                      example: "USA"
+                    createdAt:
+                      type: string
+                      format: date-time
+                    updatedAt:
+                      type: string
+                      format: date-time
+        401:
+          description: Unauthorized - User must be logged in
+        500:
+          description: Server error
+
+    post:
+      tags:
+        - Address
+      summary: Create a new address for the logged-in user
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                street:
+                  type: string
+                  example: "123 Main St"
+                city:
+                  type: string
+                  example: "New York"
+                state:
+                  type: string
+                  example: "NY"
+                postalCode:
+                  type: string
+                  example: "10001"
+                country:
+                  type: string
+                  example: "USA"
+      responses:
+        201:
+          description: Address created successfully
+        400:
+          description: Missing required fields
+        401:
+          description: Unauthorized - User must be logged in
+        500:
+          description: Server error
+
+  /addresses/{id}:
+    put:
+      tags:
+        - Address
+      summary: Update an existing address for the logged-in user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The address ID
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                street:
+                  type: string
+                  example: "123 Main St"
+                city:
+                  type: string
+                  example: "New York"
+                state:
+                  type: string
+                  example: "NY"
+                postalCode:
+                  type: string
+                  example: "10001"
+                country:
+                  type: string
+                  example: "USA"
+      responses:
+        200:
+          description: Address updated successfully
+        400:
+          description: Invalid address details
+        401:
+          description: Unauthorized - User must be logged in
+        404:
+          description: Address not found or unauthorized access
+        500:
+          description: Server error
+
+    delete:
+      tags:
+        - Address
+      summary: Delete an existing address for the logged-in user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The address ID
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      responses:
+        200:
+          description: Address deleted successfully
+        404:
+          description: Address not found or unauthorized access
+        401:
+          description: Unauthorized - User must be logged in
+        500:
+          description: Server error
+
+  /products:
+    get:
+      tags:
+        - Product
+      summary: Get all products
+      responses:
+        200:
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        500:
+          description: Server error
+    post:
+      tags:
+        - Product
+      summary: Create a new product
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Xiaomi note 9"
+                description:
+                  type: string
+                  example: "hp xiaomi dengan spek bagus"
+                price:
+                  type: number
+                  format: float
+                  example: 5000000
+                stock_quantity:
+                  type: integer
+                  example: 90
+                category:
+                  type: string
+                  example: "673e243044f62e8049bc47b0"
+                brand:
+                  type: string
+                  example: "6744b889448383f2e622f7ea"
+      responses:
+        201:
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product created successfully."
+                  product:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "6755b7d5c54f82e6e017b1f2"
+                      name:
+                        type: string
+                        example: "Xiaomi note 9"
+                      description:
+                        type: string
+                        example: "hp xiaomi dengan spek bagus"
+                      price:
+                        type: number
+                        example: 5000000
+                      stock_quantity:
+                        type: integer
+                        example: 90
+                      category:
+                        type: string
+                        example: "673e243044f62e8049bc47b0"
+                      brand:
+                        type: string
+                        example: "6744b889448383f2e622f7ea"
+        400:
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Validation failed: Missing required fields."
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "An internal server error occurred."
+
+  /products/{id}:
+    get:
+      tags:
+        - Product
+      summary: Get a product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      responses:
+        200:
+          description: Product details
+        404:
+          description: Product not found
+        500:
+          description: Server error
+    put:
+      tags:
+        - Product
+      summary: Update a product by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Product A"
+                description:
+                  type: string
+                  example: "Updated description of Product A"
+                price:
+                  type: number
+                  format: float
+                  example: 89.99
+                stock_quantity:
+                  type: integer
+                  example: 200
+      responses:
+        200:
+          description: Product updated successfully
+        404:
+          description: Product not found
+        500:
+          description: Server error
+    delete:
+      tags:
+        - Product
+      summary: Delete a product by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      responses:
+        200:
+          description: Product deleted successfully
+        404:
+          description: Product not found
+        500:
+          description: Server error
+
+  /products/{id}/imageproduct:
+    post:
+      tags:
+        - Product
+      summary: Upload an image for a product
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        201:
+          description: Image uploaded successfully
+        400:
+          description: Invalid file format or missing file
+        500:
+          description: Server error
+
+    get:
+      tags:
+        - Product
+      summary: Get a product image
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      responses:
+        200:
+          description: Product image retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: string
+                format: uri
+        404:
+          description: Image not found
+        500:
+          description: Server error
+
+  /brands:
+    get:
+      tags:
+        - Brand
+      summary: Get all brands
+      responses:
+        200:
+          description: List of brands
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: "64c123abc7890f0d1234567a"
+                    name:
+                      type: string
+                      example: "BrandX"
+                    description:
+                      type: string
+                      example: "High-quality electronics"
+                    createdAt:
+                      type: string
+                      format: date-time
+                    updatedAt:
+                      type: string
+                      format: date-time
+        500:
+          description: Server error
+
+    post:
+      tags:
+        - Brand
+      summary: Create a new brand
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "BrandY"
+                description:
+                  type: string
+                  example: "Affordable fashion"
+      responses:
+        201:
+          description: Brand created successfully
+        400:
+          description: Validation errors
+        500:
+          description: Server error
+
+  /brands/{id}:
+    get:
+      tags:
+        - Brand
+      summary: Get a brand by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The brand ID
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      responses:
+        200:
+          description: Brand details
+        404:
+          description: Brand not found
+        500:
+          description: Server error
+
+    put:
+      tags:
+        - Brand
+      summary: Update a brand by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The brand ID
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "BrandY"
+                description:
+                  type: string
+                  example: "Updated description of affordable fashion"
+      responses:
+        200:
+          description: Brand updated successfully
+        404:
+          description: Brand not found
+        500:
+          description: Server error
+
+    delete:
+      tags:
+        - Brand
+      summary: Delete a brand by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The brand ID
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      responses:
+        200:
+          description: Brand deleted successfully
+        404:
+          description: Brand not found
+        500:
+          description: Server error
+
+  /brands/{id}/image:
+    post:
+      tags:
+        - Brand
+      summary: Upload a brand image
+      description: Upload an image for a specific brand. Requires a Bearer token.
+      operationId: uploadBrandImage
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the brand to upload the image for.
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      requestBody:
+        description: The image file to upload.
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: The image file to upload.
+      responses:
+        '200':
+          description: Successfully uploaded the brand image.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Brand image uploaded successfully."
+                  brand:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "64c123abc7890f0d1234567a"
+                      imageUrl:
+                        type: string
+                        example: "https://example.com/images/brand.jpg"
+        '400':
+          description: Invalid input. Ensure the file format and size are correct.
+        '401':
+          description: Unauthorized. Token is missing or invalid.
+        '404':
+          description: Brand not found with the specified ID.
+        '500':
+          description: Server error.
+
+    get:
+      tags:
+        - Brand
+      summary: Get a brand image
+      description: Retrieve the image of a specific brand by its ID.
+      operationId: getBrandImage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the brand to retrieve the image for.
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      responses:
+        '200':
+          description: Successfully retrieved the brand image.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Brand image retrieved successfully."
+                  imageUrl:
+                    type: string
+                    example: "https://example.com/images/brand.jpg"
+        '404':
+          description: Brand not found with the specified ID.
+        '500':
+          description: Server error.
+
+
+  /categories:
+    get:
+      tags:
+        - Category
+      summary: Get all categories
+      responses:
+        200:
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: The category ID
+                      example: "64c123abc7890f0d1234567a"
+                    name:
+                      type: string
+                      example: "Electronics"
+                    description:
+                      type: string
+                      example: "All electronic products"
+        500:
+          description: Server error
+
+    post:
+      tags:
+        - Category
+      summary: Create a new category
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Books"
+                description:
+                  type: string
+                  example: "Books of all genres"
+      responses:
+        201:
+          description: Category created successfully
+        400:
+          description: Category already exists or missing fields
+        401:
+          description: Unauthorized - Admin only
+        500:
+          description: Server error
+
+  /categories/{id}:
+    get:
+      tags:
+        - Category
+      summary: Get category by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The category ID
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      responses:
+        200:
+          description: Category details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "64c123abc7890f0d1234567a"
+                  name:
+                    type: string
+                    example: "Electronics"
+                  description:
+                    type: string
+                    example: "All electronic products"
+        404:
+          description: Category not found
+        500:
+          description: Server error
+
+    put:
+      tags:
+        - Category
+      summary: Update category by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The category ID
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Home Appliances"
+                description:
+                  type: string
+                  example: "All appliances for home use"
+      responses:
+        200:
+          description: Category updated successfully
+        400:
+          description: Invalid category details
+        404:
+          description: Category not found
+        500:
+          description: Server error
+
+    delete:
+      tags:
+        - Category
+      summary: Delete category by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The category ID
+          schema:
+            type: string
+            example: "64c123abc7890f0d1234567a"
+      responses:
+        200:
+          description: Category deleted successfully
+        404:
+          description: Category not found
+        500:
+          description: Server error
+
+  paths:
+  /orders:
+    get:
+      tags:
+        - Orders
+      summary: Get all orders for the authenticated user
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: List of orders for the authenticated user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    order_id:
+                      type: string
+                      description: The order ID
+                      example: "64d123abc7890f0d1234567b"
+                    user_id:
+                      type: string
+                      description: The user ID
+                      example: "64d123abc7890f0d1234567a"
+                    total_amount:
+                      type: number
+                      format: float
+                      description: The total amount of the order
+                      example: 150.50
+                    status:
+                      type: string
+                      description: The status of the order
+                      example: "Pending"
+                    created_at:
+                      type: string
+                      format: date-time
+                      description: The creation date and time of the order
+                      example: "2024-12-06T12:00:00Z"
+        500:
+          description: Server error
+
+    post:
+      tags:
+        - Orders
+      summary: Create a new order
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  example: "64d123abc7890f0d1234567a"
+                products:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      product_id:
+                        type: string
+                        example: "64d123abc7890f0d1234567c"
+                      quantity:
+                        type: integer
+                        example: 2
+                total_amount:
+                  type: number
+                  format: float
+                  example: 150.50
+      responses:
+        201:
+          description: Order created successfully
+        400:
+          description: Invalid order data
+        401:
+          description: Unauthorized - User must be logged in
+        500:
+          description: Server error
+
+  /orders/all:
+    get:
+      tags:
+        - Orders
+      summary: Get all orders (Admin Only)
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: List of all orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    order_id:
+                      type: string
+                      description: The order ID
+                      example: "64d123abc7890f0d1234567b"
+                    user_id:
+                      type: string
+                      description: The user ID
+                      example: "64d123abc7890f0d1234567a"
+                    total_amount:
+                      type: number
+                      format: float
+                      description: The total amount of the order
+                      example: 150.50
+                    status:
+                      type: string
+                      description: The status of the order
+                      example: "Pending"
+                    created_at:
+                      type: string
+                      format: date-time
+                      description: The creation date and time of the order
+                      example: "2024-12-06T12:00:00Z"
+        403:
+          description: Forbidden - Admin privileges required
+        500:
+          description: Server error
+
+  /orders/{id}:
+    get:
+      tags:
+        - Orders
+      summary: Get order by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The order ID
+          schema:
+            type: string
+            example: "64d123abc7890f0d1234567b"
+      responses:
+        200:
+          description: Order details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: string
+                    example: "64d123abc7890f0d1234567b"
+                  user_id:
+                    type: string
+                    example: "64d123abc7890f0d1234567a"
+                  total_amount:
+                    type: number
+                    format: float
+                    example: 150.50
+                  status:
+                    type: string
+                    example: "Pending"
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2024-12-06T12:00:00Z"
+        404:
+          description: Order not found
+        500:
+          description: Server error
+
+    put:
+      tags:
+        - Orders
+      summary: Update order by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The order ID
+          schema:
+            type: string
+            example: "64d123abc7890f0d1234567b"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "Shipped"
+      responses:
+        200:
+          description: Order updated successfully
+        400:
+          description: Invalid status or order details
+        404:
+          description: Order not found
+        500:
+          description: Server error
+
+    delete:
+      tags:
+        - Orders
+      summary: Delete order by ID (Admin Only)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The order ID
+          schema:
+            type: string
+            example: "64d123abc7890f0d1234567b"
+      responses:
+        200:
+          description: Order deleted successfully
+        404:
+          description: Order not found
+        500:
+          description: Server error
+
+  /orders/{orderId}/items/{orderItemId}/status:
+    put:
+      tags:
+        - Orders
+      summary: Update the status of an order item (Admin Only)
+      description: Updates the status of a specific order item to one of the valid statuses: "pending", "shipped", "delivered", or "cancelled".
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: The ID of the order.
+          schema:
+            type: string
+        - name: orderItemId
+          in: path
+          required: true
+          description: The ID of the order item.
+          schema:
+            type: string
+        - name: status
+          in: body
+          required: true
+          description: The new status for the order item.
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "shipped"
+                enum:
+                  - pending
+                  - shipped
+                  - delivered
+                  - cancelled
+      responses:
+        '200':
+          description: Successfully updated the order item status.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Order item status updated successfully."
+                  orderItem:
+                    type: object
+                    properties:
+                      product:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            example: "Product Name"
+                          price:
+                            type: number
+                            format: float
+                            example: 20.99
+                      quantity:
+                        type: integer
+                        example: 2
+                      total_price:
+                        type: number
+                        format: float
+                        example: 41.98
+                      status:
+                        type: string
+                        example: "shipped"
+        '400':
+          description: Invalid status or other input error.
+        '404':
+          description: Order or order item not found.
+        '500':
+          description: Server error.
+
+  /orders/{orderId}/items/{orderItemId}/done:
+    put:
+      tags:
+        - Orders
+      summary: Update the status of an order item to "done"
+      description: Marks an order item as "done" after it has been delivered.
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: The ID of the order.
+          schema:
+            type: string
+        - name: orderItemId
+          in: path
+          required: true
+          description: The ID of the order item.
+          schema:
+            type: string
+        - name: status
+          in: body
+          required: true
+          description: The new status of the order item.
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: "done"
+                enum:
+                  - done
+      responses:
+        '200':
+          description: Successfully updated the order item status to "done."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Order item status updated to 'done' successfully."
+                  orderItem:
+                    type: object
+                    properties:
+                      product:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            example: "Product Name"
+                          price:
+                            type: number
+                            format: float
+                            example: 20.99
+                      quantity:
+                        type: integer
+                        example: 2
+                      total_price:
+                        type: number
+                        format: float
+                        example: 41.98
+                      status:
+                        type: string
+                        example: "done"
+        '400':
+          description: Invalid status or other input error.
+        '404':
+          description: Order or order item not found.
+        '500':
+          description: Server error.
+
+
+  /order-items:
+    get:
+      tags:
+        - Order Items
+      summary: Get all order items
+      description: Retrieve a list of all order items.
+      operationId: getOrderItems
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved the list of order items.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    product:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: "Product Name"
+                        price:
+                          type: number
+                          format: float
+                          example: 20.99
+                    quantity:
+                      type: integer
+                      example: 2
+                    total_price:
+                      type: number
+                      format: float
+                      example: 41.98
+                    status:
+                      type: string
+                      example: "pending"
+        '401':
+          description: Unauthorized access, token missing or invalid.
+        '500':
+          description: Server error.
+    
+    post:
+      tags:
+        - Order Items
+      summary: Create a new order item
+      description: Creates a new order item with the provided product and quantity.
+      operationId: addOrderItem
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: The order item to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product:
+                  type: string
+                  description: The ID of the product being added to the order.
+                  example: "674defb78d05beed8567c793"
+                quantity:
+                  type: integer
+                  description: The quantity of the product.
+                  example: 2
+      responses:
+        '201':
+          description: Order item created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Order item created successfully."
+                  orderItem:
+                    type: object
+                    properties:
+                      product:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            example: "Product Name"
+                          price:
+                            type: number
+                            format: float
+                            example: 20.99
+                      quantity:
+                        type: integer
+                        example: 2
+                      total_price:
+                        type: number
+                        format: float
+                        example: 41.98
+                      status:
+                        type: string
+                        example: "pending"
+        '400':
+          description: Invalid input data (e.g., missing product or quantity).
+        '401':
+          description: Unauthorized access, token missing or invalid.
+        '500':
+          description: Server error.
+
+  /order-items/{id}:
+    patch:
+      tags:
+        - Order Items
+      summary: Update an order item's quantity
+      description: Updates the quantity of an existing order item by its ID.
+      operationId: updateOrderItem
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the order item to update.
+          schema:
+            type: string
+      requestBody:
+        description: The data to update the order item.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  description: The new quantity of the product.
+                  example: 1
+      responses:
+        '200':
+          description: Successfully updated the order item quantity.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Order item quantity updated successfully."
+                  orderItem:
+                    type: object
+                    properties:
+                      product:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            example: "Product Name"
+                          price:
+                            type: number
+                            format: float
+                            example: 20.99
+                      quantity:
+                        type: integer
+                        example: 1
+                      total_price:
+                        type: number
+                        format: float
+                        example: 20.99
+                      status:
+                        type: string
+                        example: "pending"
+        '400':
+          description: Invalid quantity or other input error.
+        '401':
+          description: Unauthorized. Token is missing or invalid.
+        '404':
+          description: Order item not found with the specified ID.
+        '500':
+          description: Server error.
+
+    delete:
+      tags:
+        - Order Items
+      summary: Delete an order item
+      description: Deletes an order item by its ID.
+      operationId: deleteOrderItem
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the order item to delete.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully deleted the order item.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Order item deleted successfully."
+        '401':
+          description: Unauthorized. Token is missing or invalid.
+        '404':
+          description: Order item not found with the specified ID.
+        '500':
+          description: Server error.
+
+  /reviews/{productId}:
+    get:
+      tags:
+        - Reviews
+      summary: Get reviews by product ID
+      description: Retrieve all reviews associated with a specific product.
+      operationId: getReviewsByProductId
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: The ID of the product to fetch reviews for.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved the reviews.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Reviews retrieved successfully."
+                  reviews:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product:
+                          type: string
+                          example: "673f24c72395e4a8cb3d58ab"
+                        rating:
+                          type: integer
+                          example: 5
+                        comment:
+                          type: string
+                          example: "Produknya bagus gan"
+                        user:
+                          type: string
+                          example: "John Doe"
+        '404':
+          description: No reviews found for the given product ID.
+        '500':
+          description: Server error.
+
+  /reviews:
+    post:
+      tags:
+        - Reviews
+      summary: Create a new review
+      description: Submit a review for a product. Requires a Bearer token.
+      operationId: createReview
+      security:
+        - BearerAuth: []
+      requestBody:
+        description: The data for the new review.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product:
+                  type: string
+                  description: The ID of the product being reviewed.
+                  example: "673f24c72395e4a8cb3d58ab"
+                rating:
+                  type: integer
+                  description: Rating given to the product.
+                  example: 5
+                comment:
+                  type: string
+                  description: The comment about the product.
+                  example: "Produknya bagus gan"
+      responses:
+        '201':
+          description: Review created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Review created successfully."
+                  review:
+                    type: object
+                    properties:
+                      product:
+                        type: string
+                        example: "673f24c72395e4a8cb3d58ab"
+                      rating:
+                        type: integer
+                        example: 5
+                      comment:
+                        type: string
+                        example: "Produknya bagus gan"
+        '400':
+          description: Invalid input data.
+        '401':
+          description: Unauthorized. Token is missing or invalid.
+        '500':
+          description: Server error.
+
+  /reviews/{id}:
+    put:
+      tags:
+        - Reviews
+      summary: Update a review
+      description: Update an existing review by its ID. Requires a Bearer token.
+      operationId: updateReview
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the review to update.
+          schema:
+            type: string
+      requestBody:
+        description: The data to update the review.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: integer
+                  description: Updated rating for the product.
+                  example: 4
+                comment:
+                  type: string
+                  description: Updated comment about the product.
+                  example: "Produknya lumayan bagus."
+      responses:
+        '200':
+          description: Successfully updated the review.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Review updated successfully."
+                  review:
+                    type: object
+                    properties:
+                      product:
+                        type: string
+                        example: "673f24c72395e4a8cb3d58ab"
+                      rating:
+                        type: integer
+                        example: 4
+                      comment:
+                        type: string
+                        example: "Produknya lumayan bagus."
+        '400':
+          description: Invalid input data.
+        '401':
+          description: Unauthorized. Token is missing or invalid.
+        '404':
+          description: Review not found with the specified ID.
+        '500':
+          description: Server error.
+
+    delete:
+      tags:
+        - Reviews
+      summary: Delete a review
+      description: Delete an existing review by its ID. Requires a Bearer token.
+      operationId: deleteReview
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the review to delete.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully deleted the review.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Review deleted successfully."
+        '401':
+          description: Unauthorized. Token is missing or invalid.
+        '404':
+          description: Review not found with the specified ID.
+        '500':
+          description: Server error.
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

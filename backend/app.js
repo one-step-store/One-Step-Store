@@ -2,7 +2,9 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const connectDB = require("./config/database");
-const cors = require('cors');
+const cors = require("cors");
+const YAML = require("yamljs"); // Tambahkan YAMLJS
+const swaggerUi = require("swagger-ui-express"); // Tambahkan Swagger UI
 
 // Import Routes
 const authRoutes = require("./routes/authRoutes");
@@ -26,6 +28,10 @@ connectDB();
 // Middleware
 app.use(bodyParser.json());
 
+// Load Swagger documentation
+const swaggerDocument = YAML.load('./swagger.yaml'); // File YAML Swagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument)); // Swagger route
+
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/addresses", addressRoutes);
@@ -35,7 +41,6 @@ app.use("/api/brands", brandRoutes);
 app.use("/api/order-items", orderItemRoutes); // New
 app.use("/api/orders", orderRoutes); // New
 app.use("/api/reviews", reviewRoutes); // New
-
 
 // 404 Handler
 app.use("*", (req, res) => {
