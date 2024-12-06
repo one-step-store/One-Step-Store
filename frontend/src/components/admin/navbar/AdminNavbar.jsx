@@ -3,9 +3,6 @@ import { FaBell, FaUserCircle } from "react-icons/fa";
 
 function AdminNavbar() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-
-  
-
   return (
     <div className="flex justify-between items-center bg-black px-4 py-3 shadow-md text-white">
     {/* Logo */}
