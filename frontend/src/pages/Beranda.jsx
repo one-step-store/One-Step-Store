@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import { Link } from "react-router-dom"; 
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
 import products from "../data/products";
@@ -20,14 +19,14 @@ const Banner = () => {
       );
     }, 3000); 
 
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, [banners.length]);
 
   return (
     <div className="relative">
       {/* Gambar Banner */}
       <img
-        src={banners[currentIndex]} 
+        src={banners[currentIndex]}
         alt={`Banner ${currentIndex + 1}`}
         className="w-full rounded-lg transition-all duration-700"
       />
@@ -46,7 +45,7 @@ const Banner = () => {
   );
 };
 
-const Home = () => {
+const Beranda = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -92,7 +91,17 @@ const Home = () => {
 
   return (
     <>
-      <Navbar />
+      <header className="bg-black text-white py-4">
+        <div className="container mx-auto flex justify-between items-center px-8">
+        <img src="/assets/logo.png" alt="Logo" className="h-10 mr-3" />
+          <nav className="flex gap-4">
+            <Link to="/" className="px-4 py-2 lg:px-0 lg:py-0 text-white hover:text-gray-300">Home</Link>
+            <Link to="/SignUp" className="px-4 py-2 lg:px-0 lg:py-0 text-white hover:text-gray-300">Sign Up</Link>
+            <Link to="/Login" className="px-4 py-2 lg:px-0 lg:py-0 text-white hover:text-gray-300">Login</Link>
+          </nav>
+        </div>
+      </header>
+
       <main className="bg-gray-100">
         {/* Search Bar */}
         <div className="py-6 shadow-sm">
@@ -223,9 +232,10 @@ const Home = () => {
           </section>
         )}
       </main>
+
       <Footer />
     </>
   );
 };
 
-export default Home;
+export default Beranda;

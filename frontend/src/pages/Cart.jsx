@@ -1,103 +1,166 @@
-import React, { useContext } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import { FaTrashAlt } from "react-icons/fa";
-import { CartContext } from "../context/CartContext"; 
+import React, { useState, useEffect } from "react";
+import Navbar from "../components/Navbar"; 
+import Footer from "../components/Footer"; 
+import { FaTrashAlt } from "react-icons/fa"; 
+import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai"; 
 
-const Cart = () => {
-  const { cartItems, removeItem, updateQuantity } = useContext(CartContext); 
+const CartPage = () => {
+  const [cart, setCart] = useState(() => {
+    const savedCart = JSON.parse(localStorage.getItem("cart"));
+    return savedCart || [];
+  });
 
-  // Hitung subtotal
-  const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  // Fungsi untuk menghapus item dari keranjang
+  const removeFromCart = (productId) => {
+    const updatedCart = cart.filter((item) => item.id !== productId);
+    setCart(updatedCart);
   };
 
+  // Fungsi untuk menambah kuantitas produk
+  const increaseQuantity = (productId) => {
+    const updatedCart = cart.map((item) =>
+      item.id === productId
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
+    );
+    setCart(updatedCart);
+  };
+
+  // Fungsi untuk mengurangi kuantitas produk
+  const decreaseQuantity = (productId) => {
+    const updatedCart = cart.map((item) =>
+      item.id === productId && item.quantity > 1
+        ? { ...item, quantity: item.quantity - 1 }
+        : item
+    );
+    setCart(updatedCart);
+  };
+
+  // Fungsi untuk menghitung total harga
+  const getTotalPrice = () => {
+    return cart.reduce(
+      (total, product) => total + (product.discountPrice * product.quantity || 0),
+      0
+    );
+  };
+
+  // Menyimpan perubahan ke localStorage
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
   return (
-    <>
+    <div>
+      {/* Navbar */}
       <Navbar />
-      <div className="container mx-auto px-6 py-12">
-        <h1 className="text-2xl font-bold mb-8 text-center">Shopping Cart</h1>
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Daftar Produk */}
-          <div className="flex-1 bg-white shadow-md rounded-lg p-6">
-            <h2 className="text-lg font-semibold mb-4">Your Items</h2>
-            {cartItems.length === 0 ? (
-              <p className="text-gray-500 text-center">Your cart is empty</p>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-8 py-16">
+        <h1 className="text-3xl font-semibold mb-6">Your Shopping Cart</h1>
+
+        <div className="flex gap-8">
+          {/* Produk Section */}
+          <div className="flex-1">
+            {cart.length > 0 ? (
+              <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
+                <table className="min-w-full table-auto">
+                  <thead>
+                    <tr className="bg-gray-100 border-b">
+                      <th className="py-3 px-4 text-left">Product</th>
+                      <th className="py-3 px-4 text-left">Price</th>
+                      <th className="py-3 px-4 text-left">Quantity</th>
+                      <th className="py-3 px-4 text-left">Remove</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cart.map((product) => (
+                      <tr key={product.id} className="border-b hover:bg-gray-50">
+                        <td className="py-4 px-4 flex items-center">
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-16 h-16 object-cover rounded-md mr-4"
+                          />
+                          <div>
+                            <h3 className="font-semibold text-lg">{product.name}</h3>
+                            <p className="text-gray-500">{product.category}</p>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4 text-green-600 font-semibold">
+                          {/* Menggunakan format angka dengan pemisah ribuan */}
+                          Rp {((product.discountPrice || 0) * product.quantity).toLocaleString()}
+                        </td>
+                        <td className="py-4 px-4 flex items-center gap-4">
+                          <button
+                            className="text-gray-600 hover:text-gray-800"
+                            onClick={() => decreaseQuantity(product.id)}
+                          >
+                            <AiOutlineMinus className="text-xl" />
+                          </button>
+                          <span className="text-lg font-semibold">{product.quantity}</span>
+                          <button
+                            className="text-gray-600 hover:text-gray-800"
+                            onClick={() => increaseQuantity(product.id)}
+                          >
+                            <AiOutlinePlus className="text-xl" />
+                          </button>
+                        </td>
+                        <td className="py-4 px-4">
+                          <button
+                            className="text-red-600 hover:text-red-800"
+                            onClick={() => removeFromCart(product.id)}
+                          >
+                            <FaTrashAlt className="text-xl" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ) : (
-              cartItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between mb-6 border-b pb-4"
-                >
-                  <div className="flex items-center">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-20 h-20 rounded-lg mr-4 object-cover"
-                    />
-                    <div>
-                      <h3 className="text-lg font-semibold">{item.name}</h3>
-                      <p className="text-sm text-gray-500">{item.code}</p>
-                      <p className="text-sm font-semibold mt-2 text-gray-800">
-                        Rp{item.price.toLocaleString("id-ID")}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    {/* Update Quantity */}
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      -
-                    </button>
-                    <p className="mx-2">{item.quantity}</p>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      +
-                    </button>
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="text-red-500 hover:text-red-700 ml-4"
-                    >
-                      <FaTrashAlt size={18} />
-                    </button>
-                  </div>
-                </div>
-              ))
+              <p className="text-gray-500 mt-6">Your cart is currently empty.</p>
             )}
           </div>
 
-          {/* Ringkasan Pesanan */}
-          <div className="bg-white shadow-md rounded-lg p-6 w-full lg:w-1/3">
-            <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+          {/* Total Price Section */}
+          <div className="w-1/3 bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-semibold mb-4">Order Summary</h2>
+
+            {/* Total Price */}
             <div className="flex justify-between items-center mb-4">
-              <p className="text-gray-600">Subtotal</p>
-              <p className="text-lg font-semibold">
-                Rp{calculateSubtotal().toLocaleString("id-ID")}
-              </p>
+              <span className="font-medium text-lg">Total:</span>
+              <span className="text-2xl font-semibold text-green-600">
+                Rp {getTotalPrice().toLocaleString()}
+              </span>
             </div>
-            <div className="flex justify-between items-center mb-4">
-              <p className="text-gray-600">Discount</p>
-              <p className="text-lg font-semibold">Rp0</p>
+
+            {/* Checkout Button */}
+            <div className="mt-6 text-center">
+              {cart.length > 0 ? (
+                <button
+                  className="bg-black text-white py-3 px-8 rounded-lg hover:bg-gray-800 transition"
+                  onClick={() => alert("Proceeding to checkout...")}
+                >
+                  Proceed to Checkout
+                </button>
+              ) : (
+                <button
+                  className="bg-gray-300 text-white py-3 px-8 rounded-lg cursor-not-allowed"
+                  disabled
+                >
+                  Your cart is empty
+                </button>
+              )}
             </div>
-            <div className="flex justify-between items-center border-t pt-4">
-              <p className="text-gray-800 font-semibold">Total</p>
-              <p className="text-xl font-bold text-green-600">
-                Rp{(calculateSubtotal() + 0).toLocaleString("id-ID")}
-              </p>
-            </div>
-            <button className="w-full bg-black text-white py-3 rounded-lg mt-6">
-              Proceed to Checkout
-            </button>
           </div>
         </div>
       </div>
+
+      {/* Footer */}
       <Footer />
-    </>
+    </div>
   );
 };
 
-export default Cart;
+export default CartPage;

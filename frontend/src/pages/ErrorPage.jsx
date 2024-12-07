@@ -1,10 +1,29 @@
 import React from 'react';
+import Navbar from '../components/Navbar';  
+import Footer from '../components/Footer';  
 
 const ErrorPage = () => {
   return (
-    <div className="text-center mt-20">
-      <h1 className="text-4xl font-bold">404</h1>
-      <p className="mt-4 text-gray-600">Page Not Found</p>
+    <div className="flex flex-col min-h-screen bg-white">
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Main Content */}
+      <main className="flex-grow flex flex-col justify-center items-center text-center">
+        <h1 className="text-6xl font-bold mb-4">404 Not Found</h1>
+        <p className="text-gray-600 mb-8">
+          Your visited page not found. You may go home page.
+        </p>
+        <a
+          href="/"
+          className="bg-black text-white py-3 px-6 rounded-lg hover:bg-gray-800"
+        >
+          Back to home page
+        </a>
+      </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
