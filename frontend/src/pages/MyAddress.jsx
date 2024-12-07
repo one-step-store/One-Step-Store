@@ -12,33 +12,31 @@ const MyAddress = () => {
 
   const [savedAddress, setSavedAddress] = useState(null); 
   const [isEditing, setIsEditing] = useState(false); 
-  // Handle changes in the input fields
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setAddressData({ ...addressData, [name]: value });
   };
 
-  // Save the address to savedAddress state
   const handleSaveAddress = (e) => {
     e.preventDefault();
-    setSavedAddress(addressData); 
-    setAddressData({ street: "", city: "", state: "", zipCode: "" }); 
-    setIsEditing(false); 
+    setSavedAddress(addressData);
+    // Save to localStorage
+    localStorage.setItem("userAddress", JSON.stringify(addressData));
+    setAddressData({ street: "", city: "", state: "", zipCode: "" });
+    setIsEditing(false);
   };
 
-  // Start editing the address
   const handleEditAddress = () => {
     setIsEditing(true);
-    setAddressData(savedAddress); 
+    setAddressData(savedAddress);
   };
 
-  // Add a new address
   const handleAddAddress = () => {
     setIsEditing(true);
-    setAddressData({ street: "", city: "", state: "", zipCode: "" }); 
+    setAddressData({ street: "", city: "", state: "", zipCode: "" });
   };
 
-  // Dummy data for dropdown options
   const cities = ["Palembang", "Lampung", "Aceh"];
   const states = ["Sumatera Selatan", "DKI Jakarta", "Jawa Barat"];
   const zipCodes = ["12345", "67890", "54321"];
@@ -46,11 +44,9 @@ const MyAddress = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Navbar />
-
       <main className="flex-grow py-10 px-4 lg:px-10">
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between space-y-6 md:space-y-0">
-            {/* Address Display */}
             <div className="w-full md:w-1/3 bg-white shadow-xl rounded-lg p-6 mb-6 md:mb-0">
               {savedAddress ? (
                 <div>
@@ -75,7 +71,6 @@ const MyAddress = () => {
               )}
             </div>
 
-            {/* Address Form */}
             <div className="w-full md:w-2/3 bg-white shadow-xl rounded-lg p-6">
               <h3 className="text-2xl font-semibold mb-6">{isEditing ? 'Edit Address' : 'Add Your Address'}</h3>
               <form onSubmit={handleSaveAddress} className="space-y-6">
@@ -154,7 +149,6 @@ const MyAddress = () => {
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );

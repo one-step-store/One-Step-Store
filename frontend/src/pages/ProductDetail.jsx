@@ -120,6 +120,34 @@ const ProductDetail = () => {
           </div>
         </div>
 
+        {/* Product Details Section (Dummy Data) */}
+        <div className="mt-12 bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-3xl font-bold mb-4">Product Details</h2>
+          <div className="space-y-4">
+            <p><span className="font-semibold">Color:</span></p>
+            <div className="flex gap-4">
+              {/* Color Options */}
+              {['#000000', '#c0c0c0', '#ff0000'].map((color, index) => (
+                <div
+                  key={index}
+                  style={{
+                    backgroundColor: color,
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                  }}
+                  title={`Color ${color}`}
+                />
+              ))}
+            </div>
+            <p><span className="font-semibold">Material:</span> Cotton</p>
+            <p><span className="font-semibold">Dimensions:</span> 20cm x 30cm x 10cm</p>
+            <p><span className="font-semibold">Size:</span> Medium</p>
+            <p><span className="font-semibold">Weight:</span> 250g</p>
+          </div>
+        </div>
+
         {/* Customer Reviews Section */}
         <div className="mt-12">
           <h2 className="text-3xl font-bold mb-4">Customer Reviews</h2>

@@ -56,7 +56,7 @@ const Home = () => {
 
   const brands = [
     { name: "Apple", logo: "/assets/apple.png" },
-    { name: "Samsung", logo: "/assets/samsungg.png" },
+    { name: "Samsung", logo: "/assets/samsung.png" },
     { name: "Sony", logo: "/assets/sony.png" },
     { name: "Dell", logo: "/assets/dell.png" },
     { name: "HP", logo: "/assets/hp.png" },

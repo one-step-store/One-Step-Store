@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom"; 
-import ProductCard from "../components/ProductCard"; 
-import products from "../data/products"; 
-import Navbar from "../components/Navbar"; 
-import Footer from "../components/Footer"; 
+import { useParams } from "react-router-dom";
+import { FaCheckCircle } from "react-icons/fa"; // Import ikon centang hijau
+import ProductCard from "../components/ProductCard";
+import products from "../data/products";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 const BrandPage = () => {
-  const { brandName } = useParams(); 
+  const { brandName } = useParams(); // Ambil parameter nama brand dari URL
   const [brandProducts, setBrandProducts] = useState([]);
-  const [searchQuery, setSearchQuery] = useState(""); 
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    // Filter products based on the selected brand
+    // Filter produk berdasarkan brand yang dipilih
     const filteredProducts = products.filter(
       (product) => product.brand.toLowerCase() === brandName.toLowerCase()
     );
@@ -22,7 +23,7 @@ const BrandPage = () => {
     setSearchQuery(e.target.value);
   };
 
-  // Filter products based on search query
+  // Filter produk berdasarkan query pencarian
   const displayedProducts = brandProducts.filter((product) =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -33,14 +34,25 @@ const BrandPage = () => {
       <div className="container mx-auto px-8 py-10">
         {/* Header Brand */}
         <div className="flex flex-col items-center mb-10">
-          <img
-            src={`/logos/${brandName.toLowerCase()}.png`} 
-            alt={`${brandName} logo`}
-            className="w-24 h-24 object-contain mb-4"
-          />
-          <h2 className="text-3xl font-bold text-center">
-            All {brandName} Products
-          </h2>
+          <div className="flex items-center space-x-4">
+            <div className="w-28 h-28 overflow-hidden rounded-full border-2 border-black">
+              <img
+                src={`/assets/${brandName.toLowerCase()}.png`} // Path logo sesuai brand
+                alt={`${brandName} logo`}
+                onError={(e) => {
+                  console.error(
+                    `Image not found for brand ${brandName}. Using default image.`
+                  );
+                  e.target.src = "/assets/default.png"; // Gambar fallback
+                }}
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <h2 className="text-3xl font-bold text-center mt-4 flex items-center space-x-2">
+              <span>{brandName}</span>
+              <FaCheckCircle className="text-green-500" /> {/* Ikon centang hijau */}
+            </h2>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -62,7 +74,7 @@ const BrandPage = () => {
                 {/* Product Logo */}
                 {product.logo && (
                   <img
-                    src={product.logo} 
+                    src={product.logo}
                     alt={`${product.name} logo`}
                     className="absolute top-0 left-0 w-12 h-12 object-contain mb-4"
                   />

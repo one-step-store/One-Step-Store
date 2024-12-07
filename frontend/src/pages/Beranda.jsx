@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom"; 
 import Footer from "../components/Footer";
-import ProductCard from "../components/ProductCard";
+import CardProduct from "../components/CardProduct";
 import products from "../data/products";
 
 const Banner = () => {
@@ -182,7 +182,7 @@ const Beranda = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-10">
               {filteredProducts.length > 0 ? (
                 filteredProducts.map((product) => (
-                  <ProductCard
+                  <CardProduct
                     key={product.id}
                     id={product.id}
                     name={product.name}
@@ -205,7 +205,7 @@ const Beranda = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-10">
               {productsToDisplay.length > 0 ? (
                 productsToDisplay.map((product) => (
-                  <ProductCard
+                  <CardProduct
                     key={product.id}
                     id={product.id}
                     name={product.name}

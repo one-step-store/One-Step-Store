@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Navbar from "../components/Navbar"; 
 import Footer from "../components/Footer"; 
+import { FaStar, FaRegStar } from "react-icons/fa"; // Import icons for rating
+
 const MyOrder = () => {
   const [orders, setOrders] = useState([
     {
@@ -54,6 +56,10 @@ const MyOrder = () => {
   const handleReviewChange = (e) => {
     const { name, value } = e.target;
     setReviewData((prevState) => ({ ...prevState, [name]: value }));
+  };
+
+  const handleStarClick = (rating) => {
+    setReviewData((prevState) => ({ ...prevState, rating }));
   };
 
   const handleReviewSubmit = (e) => {
@@ -136,20 +142,18 @@ const MyOrder = () => {
                           <form onSubmit={handleReviewSubmit}>
                             <div className="mb-4">
                               <label className="block text-sm font-medium">Rating:</label>
-                              <select
-                                name="rating"
-                                value={reviewData.rating}
-                                onChange={handleReviewChange}
-                                className="w-full p-2 bg-gray-50 border rounded-md"
-                                required
-                              >
-                                <option value={0}>Pilih Rating</option>
-                                <option value={1}>1 Star</option>
-                                <option value={2}>2 Stars</option>
-                                <option value={3}>3 Stars</option>
-                                <option value={4}>4 Stars</option>
-                                <option value={5}>5 Stars</option>
-                              </select>
+                              <div className="flex space-x-1">
+                                {/* Rating stars */}
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <div
+                                    key={star}
+                                    onClick={() => handleStarClick(star)}
+                                    className={`cursor-pointer ${star <= reviewData.rating ? "text-yellow-500" : "text-gray-300"}`}
+                                  >
+                                    {star <= reviewData.rating ? <FaStar /> : <FaRegStar />}
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                             <textarea
                               name="review"

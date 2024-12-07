@@ -32,7 +32,7 @@ const Navbar = () => {
         >
           <div className="flex flex-col lg:flex-row lg:items-center lg:space-x-6">
             <Link
-              to="/"
+              to="/home"
               className="px-4 py-2 lg:px-0 lg:py-0 text-white hover:text-gray-300"
             >
               Home
