@@ -28,7 +28,7 @@ const ProductCard = ({ product }) => {
       <div className="flex justify-between mt-4">
         {/* Edit Button */}
         <NavLink
-          to="/dashboard/product-detail"
+          to="/dashboard/product-detail/:id"
           className="flex items-center gap-2 text-blue-500 hover:underline hover:text-blue-700 transition-colors"
         >
           <FaEdit className="text-blue-500" />

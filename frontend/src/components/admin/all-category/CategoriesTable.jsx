@@ -33,7 +33,7 @@ const CategoriesTable = ({ categories }) => {
 
                 <td className="px-4 py-3 text-center relative">
                   <Link
-                    to={`/dashboard/edit-category`}
+                    to={`/dashboard/edit-category/:id`}
                     className="flex items-center justify-center group relative w-full h-full"
                   >
                     <FaEdit className="text-blue-500 text-lg group-hover:opacity-0 transition-opacity duration-200" />

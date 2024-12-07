@@ -22,7 +22,7 @@ const BrandCard = ({ brand }) => {
       <div className="flex justify-between w-full mt-4">
         {/* Edit Button */}
         <Link
-          to={`/dashboard/edit-brand`}
+          to={`/dashboard/edit-brand/:id`}
           className="relative flex items-center justify-center group"
         >
           <FaEdit className="text-blue-500 text-lg group-hover:opacity-0 transition-opacity duration-200" />
