@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import Footer from "../../components/user/Footer";
 import CardProduct from "../../components/user/CardProduct";
 import { apiRequest, HTTP_METHODS, getUserSession } from "../../utils/utils";
-
 const Banner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const banners = ["/assets/banner.jpeg", "/assets/banner2.jpeg"];

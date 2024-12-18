@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { FaCheckCircle } from "react-icons/fa"; 
+import { FaCheckCircle } from "react-icons/fa";
 import ProductCard from "../../components/user/ProductCard";
 import Navbar from "../../components/user/Navbar";
 import Footer from "../../components/user/Footer";
 import { apiRequest, HTTP_METHODS } from "../../utils/utils";
 
 const BrandPage = () => {
-  const { brandId } = useParams(); 
+  const { brandId } = useParams();
   const [brandProducts, setBrandProducts] = useState([]);
-  const [brandInfo, setBrandInfo] = useState(null); 
+  const [brandInfo, setBrandInfo] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -18,7 +18,7 @@ const BrandPage = () => {
     const fetchBrandInfo = async () => {
       try {
         const response = await apiRequest(
-          HTTP_METHODS.GET, 
+          HTTP_METHODS.GET,
           `/api/brands/${brandId}`
         );
 
@@ -38,10 +38,10 @@ const BrandPage = () => {
   // Ambil Data Produk
   useEffect(() => {
     const fetchProductsByBrand = async () => {
-      setLoading(true); 
+      setLoading(true);
       try {
         const response = await apiRequest(
-          HTTP_METHODS.GET, 
+          HTTP_METHODS.GET,
           `/api/products/brand/${brandId}`
         );
 
@@ -53,7 +53,7 @@ const BrandPage = () => {
       } catch (error) {
         console.error("Error fetching products by brand:", error.message);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
@@ -81,7 +81,7 @@ const BrandPage = () => {
             <div className="flex items-center space-x-4">
               <div className="w-28 h-28 overflow-hidden rounded-full border-2 border-black">
                 <img
-                  src={`data:image/png;base64,${brandInfo.image}`} 
+                  src={`data:image/png;base64,${brandInfo.image}`}
                   alt={`${brandInfo.name} logo`}
                   className="w-full h-full object-contain"
                 />
@@ -109,7 +109,7 @@ const BrandPage = () => {
         {loading ? (
           <p className="text-gray-500 text-center">Loading products...</p>
         ) : displayedProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {displayedProducts.map((product) => (
               <div key={product._id} className="relative">
                 <ProductCard
