@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-// import Navbar from "../components/Navbar";
-// import Footer from "../components/Footer";
+import React, { useState, useEffect } from "react";
 import Navbar from "../../components/user/Navbar";
 import Footer from "../../components/user/Footer";
+import { apiRequest, HTTP_METHODS, getUserSession } from "../../utils/utils";
+
 const EditProfileForm = () => {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -11,53 +11,111 @@ const EditProfileForm = () => {
     phone: "",
   });
 
-  const [savedProfile, setSavedProfile] = useState(null); 
+  const [savedProfile, setSavedProfile] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const [isEditing, setIsEditing] = useState(false); 
+  
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const user = getUserSession();
+      if (!user) {
+        alert("User not logged in.");
+        return;
+      }
 
-  // Handle changes in the input fields
+      try {
+        const response = await apiRequest(
+          HTTP_METHODS.POST,
+          `/api/users/detail/${user._id}`
+        );
+
+        if (response && response.data) {
+          const { name, email, phone } = response.data;
+          setSavedProfile({
+            firstName: name.split(" ")[0] || "",
+            lastName: name.split(" ")[1] || "",
+            email: email || "",
+            phone: phone || "",
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Save the profile to savedProfile state
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
-    setSavedProfile(formData);
-    setFormData({ firstName: "", lastName: "", email: "", phone: "" }); 
-    setIsEditing(false); 
+    const user = getUserSession();
+    if (!user) {
+      alert("User not logged in.");
+      return;
+    }
+
+    try {
+      const updatedUser = {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        phone: formData.phone,
+      };
+
+      await apiRequest(
+        HTTP_METHODS.POST,
+        `/api/users/update/${user._id}`,
+        updatedUser
+      );
+
+      setSavedProfile({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+      });
+
+      alert("Profile updated successfully!");
+      setFormData({ firstName: "", lastName: "", email: "", phone: "" });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Failed to update user profile:", error);
+      alert("Failed to update profile.");
+    }
   };
 
-  // Start editing the profile
   const handleEditProfile = () => {
     setIsEditing(true);
-    setFormData(savedProfile); 
-  };
-
-  // Add a new profile
-  const handleAddProfile = () => {
-    setIsEditing(true);
-    setFormData({ firstName: "", lastName: "", email: "", phone: "" }); 
+    setFormData(savedProfile);
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <Navbar />
-
       <main className="flex-grow py-10 px-4 lg:px-10">
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between space-y-6 md:space-y-0">
-            {/* Profile Display */}
             <div className="w-full md:w-1/3 bg-white shadow-xl rounded-lg p-6 mb-6 md:mb-0">
               {savedProfile ? (
                 <div>
                   <h3 className="text-2xl font-semibold text-gray-800 mb-6">My Profile</h3>
                   <div className="space-y-2 text-gray-600">
-                    <p><span className="font-semibold">First Name:</span> {savedProfile.firstName}</p>
-                    <p><span className="font-semibold">Last Name:</span> {savedProfile.lastName}</p>
-                    <p><span className="font-semibold">Email:</span> {savedProfile.email}</p>
-                    <p><span className="font-semibold">Phone:</span> {savedProfile.phone}</p>
+                    <p>
+                      <span className="font-semibold">First Name:</span> {savedProfile.firstName}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Last Name:</span> {savedProfile.lastName}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Email:</span> {savedProfile.email}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Phone:</span> {savedProfile.phone}
+                    </p>
                   </div>
                   <div className="mt-4">
                     <button
@@ -73,9 +131,10 @@ const EditProfileForm = () => {
               )}
             </div>
 
-            {/* Profile Form */}
             <div className="w-full md:w-2/3 bg-white shadow-xl rounded-lg p-6">
-              <h3 className="text-2xl font-semibold mb-6">{isEditing ? 'Edit Profile' : 'Add Your Profile'}</h3>
+              <h3 className="text-2xl font-semibold mb-6">
+                {isEditing ? "Edit Profile" : "Add Your Profile"}
+              </h3>
               <form onSubmit={handleSaveProfile} className="space-y-6">
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700">First Name</label>
@@ -89,7 +148,7 @@ const EditProfileForm = () => {
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">Usename</label>
+                  <label className="block text-sm font-medium text-gray-700">Last Name</label>
                   <input
                     type="text"
                     name="lastName"
@@ -134,7 +193,6 @@ const EditProfileForm = () => {
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );

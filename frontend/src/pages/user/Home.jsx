@@ -3,9 +3,8 @@ import { Link } from "react-router-dom";
 import Navbar from "../../components/user/Navbar";
 import Footer from "../../components/user/Footer";
 import ProductCard from "../../components/user/ProductCard";
+import Banner from "../../components/user/Banner"; // Import the Banner component
 import { apiRequest, HTTP_METHODS } from "../../utils/utils";
-import { saveUserSession } from "../../utils/utils";
-import BannerSlide from "../../components/user/BannerSlide";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -17,7 +16,7 @@ const Home = () => {
   const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Fetch data dari API
+  // Fetch data from API
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -97,7 +96,7 @@ const Home = () => {
         {/* Banner */}
         {!searchQuery && (
           <section className="container mx-auto px-8 mt-4">
-            <BannerSlide />
+            <Banner />
           </section>
         )}
 

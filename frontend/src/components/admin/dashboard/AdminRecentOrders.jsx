@@ -35,7 +35,6 @@ function AdminRecentOrders() {
               <th className="px-4 py-3">Order ID</th>
               <th className="px-4 py-3">Date</th>
               <th className="px-4 py-3">Customer Name</th>
-              <th className="px-4 py-3">Payment Status</th>
               <th className="px-4 py-3">Shipping Status</th>
               <th className="px-4 py-3">Amount</th>
             </tr>
@@ -85,15 +84,9 @@ function AdminRecentOrders() {
                         </span>
                       ) : (
                         <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
-                          {order.status}
+                          {order.shipping && typeof order.shipping === "object" ? order.shipping.status : order.status || "Unknown"}
                         </span>
                       )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {/* Jika ada logic shipping status, silakan ganti. Jika belum ada data pengiriman, tampilkan "-" */}
-                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700">
-                        -
-                      </span>
                     </td>
                     <td className="px-4 py-3">Rp {order.amount.toLocaleString()}</td>
                   </tr>

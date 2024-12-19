@@ -1,9 +1,50 @@
-import React from "react";
+import React, { useState } from "react";
+import { getUserSession, apiRequest, HTTP_METHODS } from "../../../utils/utils";
 
 const OrderDetails = ({ order }) => {
+  const [selectedStatus, setSelectedStatus] = useState("");
+  
+  const handleSaveStatus = async () => {
+    const user = getUserSession();
+    if (!user) {
+      alert("User not logged in");
+      return;
+    }
+
+    try {
+      await apiRequest(
+        HTTP_METHODS.PUT,
+        `/api/transactions/update/${order.id}`,
+        {
+          status: 'success',
+          description: "Updated transaction description"
+        }
+      );
+
+      await apiRequest(
+        HTTP_METHODS.POST,
+        "/api/shippings",
+        {
+          order_id: order.id,
+          user_id: user._id,
+          status: selectedStatus
+        }
+      );
+
+      alert("Status updated successfully");
+    } catch (error) {
+      console.error("Failed to update status", error);
+    }
+  };
+
+  const subtotal = order.subtotal || 0;
+  const tax = order.tax || 0;
+  const discount = order.discount || 0;
+  const shippingRate = order.shippingRate || 0;
+  const total = order.total || 0;
+
   return (
     <div className="p-4 bg-gray-100">
-      {/* Order Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 shadow rounded-lg mb-6">
         <div>
           <p className="text-lg font-bold">
@@ -24,38 +65,43 @@ const OrderDetails = ({ order }) => {
           </div>
         </div>
         <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-          <select className="border px-4 py-2 rounded-md text-gray-700">
-            <option>Change Status</option>
-            <option>Diproses</option>
-            <option>Dikirim</option>
+          <select
+            className="border px-4 py-2 rounded-md text-gray-700"
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+          >
+            <option value="">Change Status</option>
+            <option value="Diproses">Diproses</option>
+            <option value="Dikirim">Dikirim</option>
           </select>
-          <button className="bg-black text-white px-4 py-2 rounded-md">
+          <button
+            className="bg-black text-white px-4 py-2 rounded-md"
+            onClick={handleSaveStatus}
+          >
             Save
           </button>
         </div>
       </div>
 
-      {/* Order Info */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white p-4 shadow rounded-lg">
           <h2 className="font-bold text-lg mb-2">Customer</h2>
-          <p>Full Name: {order.customer.name}</p>
-          <p>Email: {order.customer.email}</p>
-          <p>Phone: {order.customer.phone}</p>
+          <p>Full Name: {order.customer.name || "-"}</p>
+          <p>Email: {order.customer.email || "-"}</p>
+          <p>Phone: {order.customer.phone || "-"}</p>
         </div>
         <div className="bg-white p-4 shadow rounded-lg">
           <h2 className="font-bold text-lg mb-2">Order Info</h2>
-          <p>Shipping: {order.shipping}</p>
-          <p>Payment Method: {order.paymentMethod}</p>
-          <p>Status: {order.status}</p>
+          <p>Shipping: {order.shipping || "0"}</p>
+          <p>Payment Method: {order.paymentMethod || "-"}</p>
+          <p>Status: {order.status || "-"}</p>
         </div>
         <div className="bg-white p-4 shadow rounded-lg">
           <h2 className="font-bold text-lg mb-2">Deliver to</h2>
-          <p>Address: {order.deliveryAddress}</p>
+          <p>Address: {order.deliveryAddress || "-"}</p>
         </div>
       </div>
 
-      {/* Products Table */}
       <div className="bg-white p-4 shadow rounded-lg">
         <h2 className="font-bold text-lg mb-4">Products</h2>
         <div className="overflow-x-auto">
@@ -71,21 +117,21 @@ const OrderDetails = ({ order }) => {
             <tbody>
               {order.products.map((product, index) => (
                 <tr key={index} className="border-b">
-                  <td className="px-4 py-2">{product.name}</td>
-                  <td className="px-4 py-2">{product.orderId}</td>
-                  <td className="px-4 py-2">{product.quantity}</td>
-                  <td className="px-4 py-2">{product.total}</td>
+                  <td className="px-4 py-2">{product.name || "-"}</td>
+                  <td className="px-4 py-2">{product.orderId || "-"}</td>
+                  <td className="px-4 py-2">{product.quantity || 0}</td>
+                  <td className="px-4 py-2">Rp {product.total.toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         <div className="text-right mt-4">
-          <p>Subtotal: ₹{order.subtotal}</p>
-          <p>Tax (20%): ₹{order.tax}</p>
-          <p>Discount: ₹{order.discount}</p>
-          <p>Shipping Rate: ₹{order.shippingRate}</p>
-          <h3 className="text-lg font-bold">Total: ₹{order.total}</h3>
+          <p>Subtotal: Rp {subtotal.toLocaleString()}</p>
+          <p>Tax (20%): Rp {tax.toLocaleString()}</p>
+          <p>Discount: Rp {discount.toLocaleString()}</p>
+          <p>Shipping Rate: Rp {shippingRate.toLocaleString()}</p>
+          <h3 className="text-lg font-bold">Total: Rp {total.toLocaleString()}</h3>
         </div>
       </div>
     </div>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { apiRequest, HTTP_METHODS } from "../../utils/utils";
 import { useSearchParams } from "react-router-dom";
+import NavbarLogin from "../../components/user/NavbarLogin";
+import Footer from "../../components/user/Footer";
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -41,7 +43,9 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center">
+      <div>
+      <NavbarLogin />
+      <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center">
       <div className="bg-white shadow-md rounded-lg w-11/12 md:w-3/5 lg:w-1/3 p-8">
         <h1 className="text-2xl font-semibold text-gray-800 text-center mb-4">
           Reset Your Password
@@ -94,6 +98,8 @@ const ResetPassword = () => {
           </form>
         )}
       </div>
+    </div>
+    <Footer />
     </div>
   );
 };

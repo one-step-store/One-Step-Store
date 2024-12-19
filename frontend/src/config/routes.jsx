@@ -66,7 +66,7 @@ export const routes = createBrowserRouter([
         children: [
           { path: '', element: <AdminDashboard /> },
           { path: 'all-products', element: <AdminAllProductsPage /> },
-          { path: 'order-details', element: <AdminOrderDetailsPage /> },
+          { path: 'order-details/:id', element: <AdminOrderDetailsPage /> },
           { path: 'add-product', element: <AdminAddNewProductPage /> },
           { path: 'product-detail/:id', element: <AdminProductDetailPage /> },
           { path: 'all-categories', element: <AdminCategoriesPage /> },

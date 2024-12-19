@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import NavbarLogin from "../../components/user/NavbarLogin";
 import Footer from "../../components/user/Footer";
 import { apiRequest, HTTP_METHODS } from "../../utils/utils";
 
@@ -56,11 +57,12 @@ const SignUp = () => {
 
   return (
     <>
+    <NavbarLogin />
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
         <div className="flex flex-col lg:flex-row w-11/12 lg:w-3/4 bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="hidden lg:flex w-1/2 items-center justify-center bg-gray-100">
             <img
-              src="/src/assets/mockup.png"
+              src="/public/mockup.png"
               alt="Sign Up Illustration"
               className="w-3/4"
             />

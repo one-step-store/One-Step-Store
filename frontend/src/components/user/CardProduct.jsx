@@ -5,7 +5,7 @@ import { FaStar, FaRegStar } from "react-icons/fa";
 const CardProduct = ({ id, name, price, image, rating = 0 }) => {
   // Validasi jika harga dan gambar tidak ada atau tidak valid
   const validPrice = price ? `Rp ${price.toLocaleString()}` : "Harga Tidak Tersedia";
-  const validImage = image ? image : "default-image.jpg"; 
+  const validImage = image ? image : "default-image.jpg"; // Gambar default jika image tidak ada
   
   return (
     <div className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition hover:scale-105">

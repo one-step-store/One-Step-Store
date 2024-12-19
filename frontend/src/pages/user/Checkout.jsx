@@ -17,6 +17,7 @@ const Checkout = () => {
   const [checkPaymentError, setCheckPaymentError] = useState(null);
   const navigate = useNavigate();
 
+  
   useEffect(() => {
     const fetchUserAddress = async () => {
       const user = getUserSession();
@@ -127,7 +128,7 @@ const Checkout = () => {
       if (response.data && response.code === 0 && response.data.status_code === "200") {
         await deleteAllCartItems();
         setIsModalOpen(false);
-        navigate("/home");
+        alert("Pembayaran Success.");
       } else {
         setCheckPaymentError("Pembayaran belum berhasil, silakan coba lagi nanti.");
       }
@@ -234,31 +235,53 @@ const Checkout = () => {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-md shadow-lg max-w-md w-full">
-            {!transactionData ? (
-              <div>Loading...</div>
-            ) : (
-              <>
-                <h2 className="text-xl font-semibold mb-4">Transaction Created Successfully</h2>
-                <div className="space-y-2">
-                  <p><strong>Order ID:</strong> {transactionData.order_id}</p>
-                  <p><strong>Bank:</strong> {transactionData.va_numbers && transactionData.va_numbers[0].bank}</p>
-                  <p><strong>VA Number:</strong> {transactionData.va_numbers && transactionData.va_numbers[0].va_number}</p>
-                  <p><strong>Gross Amount:</strong> Rp. {parseInt(transactionData.gross_amount).toLocaleString()}</p>
-                  <p><strong>Time Remaining to Expire:</strong> {timeRemaining ? timeRemaining : "Calculating..."}</p>
-                </div>
-                {checkPaymentError && (
-                  <p className="text-red-500 mt-2">{checkPaymentError}</p>
+          {!transactionData ? (
+            <div>Loading...</div>
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold mb-4">Transaction Created Successfully</h2>
+              <div className="space-y-2">
+                <p><strong>Order ID:</strong> {transactionData.order_id}</p>
+
+                {transactionData.va_numbers && transactionData.va_numbers.length > 0 ? (
+                  <>
+                    <p><strong>Bank:</strong> {transactionData.va_numbers[0].bank}</p>
+                    <p><strong>VA Number:</strong> {transactionData.va_numbers[0].va_number}</p>
+                  </>
+                ) : transactionData.bill_key && transactionData.biller_code ? (
+                  <>
+                    <p><strong>Bank:</strong> Mandiri Bill</p>
+                    <p><strong>Bill Key:</strong> {transactionData.bill_key}</p>
+                    <p><strong>Biller Code:</strong> {transactionData.biller_code}</p>
+                  </>
+                ) : transactionData.permata_va_number ? (
+                  <>
+                    <p><strong>Bank:</strong> {transactionData.va_numbers[0].bank}</p>
+                    <p><strong>VA Number:</strong> {transactionData.permata_va_number}</p>
+                  </>
+                ) : (
+                  <p className="text-red-500">Payment Information Not Available</p>
                 )}
-                <div className="mt-6 flex justify-end">
-                  <button
-                    onClick={handleCheckPayment}
-                    className="bg-black text-white px-4 py-2 rounded-md"
-                  >
-                    Cek Pembayaran
-                  </button>
-                </div>
-              </>
-            )}
+
+                <p><strong>Gross Amount:</strong> Rp. {parseInt(transactionData.gross_amount).toLocaleString()}</p>
+                <p><strong>Time Remaining to Expire:</strong> {timeRemaining ? timeRemaining : "Calculating..."}</p>
+              </div>
+
+              {checkPaymentError && (
+                <p className="text-red-500 mt-2">{checkPaymentError}</p>
+              )}
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={handleCheckPayment}
+                  className="bg-black text-white px-4 py-2 rounded-md"
+                >
+                  Cek Pembayaran
+                </button>
+              </div>
+            </>
+          )}
+
           </div>
         </div>
       )}
