@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { FaUserCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { Cloudinary } from '@cloudinary/url-gen';
+import { auto } from '@cloudinary/url-gen/actions/resize';
+import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
+import { AdvancedImage } from '@cloudinary/react';
 import { getUserSession, clearUserSession, apiRequest, HTTP_METHODS } from '../../../utils/utils';
 
 function AdminNavbar() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [userName, setUserName] = useState('Admin');
+
+  const cld = new Cloudinary({ cloud: { cloudName: 'di5xtc8ty' } });
+      
+  const img = cld
+          .image('kbnbyejqana3nfe2wfyv')
+          .format('auto') 
+          .quality('auto')
 
   useEffect(() => {
     const user = getUserSession();
@@ -29,7 +40,7 @@ function AdminNavbar() {
     <div className="flex justify-between items-center bg-black px-4 py-3 shadow-md text-white">
       {/* Logo */}
       <div>
-        <img src="/public/logo.png" alt="Logo" className="h-10 w-10" />
+        <AdvancedImage cldImg={img} className="h-10 mr-3"/>
       </div>
 
       {/* Profile */}

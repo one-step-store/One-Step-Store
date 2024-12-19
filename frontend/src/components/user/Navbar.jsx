@@ -2,11 +2,22 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaShoppingCart, FaUser , FaBars, FaTimes } from "react-icons/fa";
 import { apiRequest, HTTP_METHODS, clearUserSession } from "../../utils/utils";
+import { Cloudinary } from '@cloudinary/url-gen';
+import { auto } from '@cloudinary/url-gen/actions/resize';
+import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
+import { AdvancedImage } from '@cloudinary/react';
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAboutPopupOpen, setIsAboutPopupOpen] = useState(false);
+
+  const cld = new Cloudinary({ cloud: { cloudName: 'di5xtc8ty' } });
+    
+  const img = cld
+        .image('kbnbyejqana3nfe2wfyv')
+        .format('auto') 
+        .quality('auto')
   
   const dropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
@@ -59,14 +70,15 @@ const Navbar = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+
+ }, []);
 
   return (
     <header className="bg-black text-white py-4 shadow-md">
       <div className="container mx-auto flex items-center justify-between px-8">
         {/* Logo */}
         <div className="flex items-center">
-          <img src="/public/logo.png" alt="Logo" className="h-10 mr-3" />
+        <AdvancedImage cldImg={img} className="h-10 mr-3"/>
         </div>
 
         {/* Navigation Links */}

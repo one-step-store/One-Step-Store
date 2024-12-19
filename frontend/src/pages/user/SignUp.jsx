@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import NavbarLogin from "../../components/user/NavbarLogin";
 import Footer from "../../components/user/Footer";
 import { apiRequest, HTTP_METHODS } from "../../utils/utils";
+import { Cloudinary } from '@cloudinary/url-gen';
+import { auto } from '@cloudinary/url-gen/actions/resize';
+import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
+import { AdvancedImage } from '@cloudinary/react';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +18,13 @@ const SignUp = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false); 
   const [success, setSuccess] = useState(""); 
+
+  const cld = new Cloudinary({ cloud: { cloudName: 'di5xtc8ty' } });
+          
+  const img = cld
+              .image('swy6z0aibiyvoansyjuw')
+              .format('auto') 
+              .quality('auto')
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,11 +72,7 @@ const SignUp = () => {
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
         <div className="flex flex-col lg:flex-row w-11/12 lg:w-3/4 bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="hidden lg:flex w-1/2 items-center justify-center bg-gray-100">
-            <img
-              src="/public/mockup.png"
-              alt="Sign Up Illustration"
-              className="w-3/4"
-            />
+            <AdvancedImage cldImg={img} className="w-3/4"/>
           </div>
 
           <div className="w-full lg:w-1/2 p-8">

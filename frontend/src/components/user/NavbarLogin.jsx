@@ -1,11 +1,22 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
+import { Cloudinary } from '@cloudinary/url-gen';
+import { auto } from '@cloudinary/url-gen/actions/resize';
+import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
+import { AdvancedImage } from '@cloudinary/react';
 
 const NavbarLogin = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAboutPopupOpen, setIsAboutPopupOpen] = useState(false);
   const mobileMenuRef = useRef(null);
+
+  const cld = new Cloudinary({ cloud: { cloudName: 'di5xtc8ty' } });
+    
+  const img = cld
+        .image('kbnbyejqana3nfe2wfyv')
+        .format('auto') 
+        .quality('auto')
 
   const handleMobileMenuToggle = () => {
     setIsMobileMenuOpen((prevState) => !prevState);
@@ -36,9 +47,8 @@ const NavbarLogin = () => {
   return (
     <header className="bg-black text-white py-4">
       <div className="container mx-auto flex justify-between items-center px-8">
-        <img src="/public/logo.png" alt="Logo" className="h-10 mr-3" />
-        
-        <button
+      <AdvancedImage cldImg={img} className="h-10 mr-3"/>
+      <button
           onClick={handleMobileMenuToggle}
           className="lg:hidden text-white text-xl"
         >
