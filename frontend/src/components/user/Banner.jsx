@@ -1,11 +1,28 @@
 // src/components/user/Banner.js
 import React, { useState, useEffect } from "react";
+import { Cloudinary } from '@cloudinary/url-gen';
+import { auto } from '@cloudinary/url-gen/actions/resize';
+import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
+import { AdvancedImage } from '@cloudinary/react';
 
 const Banner = () => {
+  const cld = new Cloudinary({ cloud: { cloudName: 'di5xtc8ty' } });
+    
+  const img = cld
+        .image('endtkmfvlyxw4au1wxme')
+        .format('auto') 
+        .quality('auto')
+
+  const img2 = cld
+        .image('bk3oqqp7epazngra1dpl')
+        .format('auto') 
+        .quality('auto')
+
   const [currentIndex, setCurrentIndex] = useState(0); 
+
   const banners = [
-    "/public/banner.jpeg", 
-    "/public/banner2.jpeg", 
+    <AdvancedImage cldImg={img}/>,
+    <AdvancedImage cldImg={img2}/>,
   ];
 
   useEffect(() => {
@@ -32,11 +49,8 @@ const Banner = () => {
 
   return (
     <div className="relative">
-      <img
-        src={banners[currentIndex]}
-        alt={`Banner ${currentIndex + 1}`}
-        className="w-full rounded-lg transition-all duration-700"
-      />
+      {banners[currentIndex]}
+    
 
       <button
         onClick={handlePrev}
