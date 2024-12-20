@@ -66,7 +66,7 @@ function AdminRecentOrders() {
                         <ul className="list-disc list-inside space-y-1">
                           {order.product_id.map((prodItem, idx) => (
                             <li key={idx}>
-                              {prodItem.product_id.name} (x{prodItem.quantity})
+                               {prodItem.product_id?.name || "gak ada"} (x{prodItem.quantity})
                             </li>
                           ))}
                         </ul>
